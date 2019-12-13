@@ -19,6 +19,7 @@
 #include "switch.h"
 
 #define DBUS_CALL_TIMEOUT 2000
+#define MAX_LAYOUTS_MAP_BUF 1024
 
 static const gchar *method_activate_head =
     "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
@@ -31,6 +32,11 @@ static const gsize method_activate_len =
 struct value_search_data {
     const gchar *value;
     guintptr idx;
+};
+
+struct print_layouts_map_data {
+    gint written;
+    gchar *p;
 };
 
 
@@ -90,6 +96,30 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data ) {
 
 gboolean Xkb_Switch_printXkbLayouts( gpointer k, gpointer v, gpointer unused ) {
     g_print( "%s\n", ( const char * ) v );
+
+    return FALSE;
+}
+
+
+gboolean print_layouts_map( gpointer k, gpointer v, gpointer data ) {
+    guintptr key;
+    gchar *value;
+    struct print_layouts_map_data *pld;
+    gint w;
+
+    key = ( guintptr ) k;
+    value = ( gchar * ) v;
+    pld = ( struct print_layouts_map_data * ) data;
+
+    if ( pld->written >= MAX_LAYOUTS_MAP_BUF ) {
+        return FALSE;
+    }
+
+    w = g_snprintf( pld->p, MAX_LAYOUTS_MAP_BUF - pld->written, "%d:'%s',",
+                    ( gint ) key, ( const char * ) value );
+    pld->written += w;
+    pld->p += w;
+
     return FALSE;
 }
 
@@ -122,11 +152,11 @@ GTree *Xkb_Switch_buildXkbLayoutsMap() {
     gchar *res = NULL;
     gchar *key, *value;
     gpointer k, v;
-    gboolean *success;
+    gboolean success;
     gchar *dict = NULL;
 
     GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if (c == NULL) {
+    if ( c == NULL ) {
         return NULL;
     }
 
@@ -238,11 +268,11 @@ gchar *Xkb_Switch_getXkbLayoutRaw() {
     GVariant *param = NULL;
     GVariantBuilder builder;
     gchar *method = NULL;
-    gboolean *success;
+    gboolean success;
     gchar *value = NULL;
 
     GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if (c == NULL) {
+    if ( c == NULL ) {
         return NULL;
     }
 
@@ -297,10 +327,10 @@ gboolean Xkb_Switch_setXkbLayoutRaw( const gchar *value ) {
     GVariant *param = NULL;
     GVariantBuilder builder;
     gchar method[ method_activate_len ];
-    gboolean *success;
+    gboolean success;
 
     GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if (c == NULL) {
+    if ( c == NULL ) {
         return FALSE;
     }
 
@@ -373,5 +403,21 @@ guintptr Xkb_Switch_reverseSearchXkbLayout( GTree *layouts, gchar *layout ) {
     g_tree_foreach( layouts, value_search, &vs );
 
     return vs.idx;
+}
+
+
+gchar *Xkb_Switch_getXkbLayoutsMap( GTree *layouts ) {
+    gchar dict[ MAX_LAYOUTS_MAP_BUF ];
+    struct print_layouts_map_data pld;
+
+    pld.written = 3;
+    pld.p = dict;
+
+    *pld.p++ = '{';
+    g_tree_foreach( layouts, print_layouts_map, &pld );
+    *pld.p++ = '}';
+    *pld.p = '\0';
+
+    return g_strdup( dict );
 }
 

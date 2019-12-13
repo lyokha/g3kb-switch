@@ -30,6 +30,7 @@ gchar *Xkb_Switch_getXkbLayoutRaw();
 gboolean Xkb_Switch_setXkbLayoutRaw( const gchar *value );
 gpointer Xkb_Switch_searchXkbLayout( GTree *layouts, gchar *layout );
 guintptr Xkb_Switch_reverseSearchXkbLayout( GTree *layouts, gchar *layout );
+gchar *Xkb_Switch_getXkbLayoutsMap( GTree *layouts );
 
 #endif  /* G3KB_SWITCH_H */
 

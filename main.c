@@ -38,9 +38,11 @@ int main( int argc, char **argv ) {
     gpointer layout;
     guintptr idx;
     gchar s_idx[ 3 ];
+    gchar *layouts_map = NULL;
     gboolean print_layouts = FALSE;
     gboolean display_current_layout = FALSE;
     gboolean activate_new_layout = FALSE;
+    gboolean print_layouts_map = FALSE;
 
     if ( argc > 1 ) {
         if ( g_strcmp0 ( argv[ 1 ], "-h" ) == 0 ||
@@ -67,6 +69,9 @@ int main( int argc, char **argv ) {
             }
             activate_new_layout = TRUE;
             new_layout = argv[ 2 ];
+        } else if ( g_strcmp0 ( argv[ 1 ], "-t" ) == 0 )
+        {
+            print_layouts_map = TRUE;
         }
     } else {
         display_current_layout = TRUE;
@@ -93,7 +98,7 @@ int main( int argc, char **argv ) {
             g_tree_unref( layouts );
             exit( 1 );
         }
-        g_print( "%s\n", layout );
+        g_print( "%s\n", ( char * ) layout );
         g_free( layout_raw );
     } else if ( activate_new_layout ) {
         idx = Xkb_Switch_reverseSearchXkbLayout( layouts, new_layout );
@@ -102,12 +107,16 @@ int main( int argc, char **argv ) {
             g_tree_unref( layouts );
             exit( 1 );
         }
-        g_snprintf( s_idx, 3, "%d", idx );
+        g_snprintf( s_idx, 3, "%d", ( int ) idx );
         if ( ! Xkb_Switch_setXkbLayoutRaw( s_idx ) ) {
             g_printerr( "Failed to activate layout %s!\n", new_layout );
             g_tree_unref( layouts );
             exit( 1 );
         }
+    } else if ( print_layouts_map ) {
+        layouts_map = Xkb_Switch_getXkbLayoutsMap( layouts );
+        g_print( "%s\n", layouts_map );
+        g_free( layouts_map );
     }
 
     g_tree_unref( layouts );
