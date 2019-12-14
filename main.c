@@ -92,6 +92,7 @@ int main( int argc, char **argv )
         layout = g3kb_search_layout( layouts, layout_raw );
         if ( layout == NULL ) {
             g_printerr( "Failed to find layout with index %s!\n", layout_raw );
+            g_free( layout_raw );
             g_tree_unref( layouts );
             exit( 1 );
         }

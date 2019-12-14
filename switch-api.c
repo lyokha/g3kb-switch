@@ -41,8 +41,11 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
 
     layout = g3kb_search_layout( layouts, layout_raw );
     if ( layout == NULL ) {
+        g_free( layout_raw );
         return "";
     }
+
+    g_free( layout_raw );
 
     return layout;
 }
