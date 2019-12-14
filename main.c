@@ -23,7 +23,8 @@
 #define VERSION_MIN 1
 
 
-int usage() {
+int usage( void )
+{
     g_print( "Usage: g3kb-switch -s ARG    Sets current layout group to ARG\n"
              "       g3kb-switch -l        Displays all layout groups\n"
              "       g3kb-switch -h        Displays this message\n"
@@ -31,37 +32,36 @@ int usage() {
              "       g3kb-switch [-p]      Displays current layout group\n" );
 }
 
-int main( int argc, char **argv ) {
+int main( int argc, char **argv )
+{
     GTree *layouts;
     gchar *layout_raw = NULL;
     gchar *new_layout = NULL;
     gpointer layout;
     guintptr idx;
     gchar s_idx[ 3 ];
-    gchar *layouts_map = NULL;
     gboolean print_layouts = FALSE;
     gboolean display_current_layout = FALSE;
     gboolean activate_new_layout = FALSE;
-    gboolean print_layouts_map = FALSE;
 
     if ( argc > 1 ) {
-        if ( g_strcmp0 ( argv[ 1 ], "-h" ) == 0 ||
-             g_strcmp0 ( argv[ 1 ], "--help" ) == 0 )
+        if ( g_strcmp0( argv[ 1 ], "-h" ) == 0 ||
+             g_strcmp0( argv[ 1 ], "--help" ) == 0 )
         {
             usage ();
             return 0;
-        } else if ( g_strcmp0 ( argv[ 1 ], "-v" ) == 0 ||
-                    g_strcmp0 ( argv[ 1 ], "--version" ) == 0 )
+        } else if ( g_strcmp0( argv[ 1 ], "-v" ) == 0 ||
+                    g_strcmp0( argv[ 1 ], "--version" ) == 0 )
         {
             g_print( "g3kb-switch version %d.%d\n", VERSION_MAJ, VERSION_MIN );
             return 0;
-        } else if ( g_strcmp0 ( argv[ 1 ], "-l" ) == 0 )
+        } else if ( g_strcmp0( argv[ 1 ], "-l" ) == 0 )
         {
             print_layouts = TRUE;
-        } else if ( g_strcmp0 ( argv[ 1 ], "-p" ) == 0 )
+        } else if ( g_strcmp0( argv[ 1 ], "-p" ) == 0 )
         {
             display_current_layout = TRUE;
-        } else if ( g_strcmp0 ( argv[ 1 ], "-s" ) == 0 )
+        } else if ( g_strcmp0( argv[ 1 ], "-s" ) == 0 )
         {
             if ( argc < 3 ) {
                 usage ();
@@ -69,30 +69,27 @@ int main( int argc, char **argv ) {
             }
             activate_new_layout = TRUE;
             new_layout = argv[ 2 ];
-        } else if ( g_strcmp0 ( argv[ 1 ], "-t" ) == 0 )
-        {
-            print_layouts_map = TRUE;
         }
     } else {
         display_current_layout = TRUE;
     }
 
-    layouts = Xkb_Switch_buildXkbLayoutsMap();
+    layouts = g3kb_build_layouts_map();
     if ( layouts == NULL ) {
         g_printerr( "Failed to build keyboard layouts map!\n" );
         exit( 1 );
     }
 
     if ( print_layouts ) {
-        g_tree_foreach( layouts, Xkb_Switch_printXkbLayouts, NULL );
+        g_tree_foreach( layouts, g3kb_print_layouts, NULL );
     } else if ( display_current_layout ) {
-        layout_raw = Xkb_Switch_getXkbLayoutRaw();
+        layout_raw = g3kb_get_layout();
         if ( layout_raw == NULL ) {
             g_printerr( "Failed to get current keyboard layout!\n" );
             g_tree_unref( layouts );
             exit( 1 );
         }
-        layout = Xkb_Switch_searchXkbLayout( layouts, layout_raw );
+        layout = g3kb_search_layout( layouts, layout_raw );
         if ( layout == NULL ) {
             g_printerr( "Failed to find layout with index %s!\n", layout_raw );
             g_tree_unref( layouts );
@@ -101,22 +98,18 @@ int main( int argc, char **argv ) {
         g_print( "%s\n", ( char * ) layout );
         g_free( layout_raw );
     } else if ( activate_new_layout ) {
-        idx = Xkb_Switch_reverseSearchXkbLayout( layouts, new_layout );
-        if ( idx == G3KB_SWITCH_MAX_LAYOUTS ) {
+        idx = g3kb_reverse_search_layout( layouts, new_layout );
+        if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
             g_printerr( "Unable to find layout %s!\n", new_layout );
             g_tree_unref( layouts );
             exit( 1 );
         }
         g_snprintf( s_idx, 3, "%d", ( int ) idx );
-        if ( ! Xkb_Switch_setXkbLayoutRaw( s_idx ) ) {
+        if ( ! g3kb_set_layout( s_idx ) ) {
             g_printerr( "Failed to activate layout %s!\n", new_layout );
             g_tree_unref( layouts );
             exit( 1 );
         }
-    } else if ( print_layouts_map ) {
-        layouts_map = Xkb_Switch_getXkbLayoutsMap( layouts );
-        g_print( "%s\n", layouts_map );
-        g_free( layouts_map );
     }
 
     g_tree_unref( layouts );

@@ -3,7 +3,7 @@
  *
  *       Filename:  switch.c
  *
- *    Description:  g3kb-switch implementation and vim-xkbswitch API
+ *    Description:  g3kb-switch implementation
  *
  *        Version:  1.0
  *        Created:  13.12.2019 12:13:37
@@ -16,10 +16,10 @@
  * =============================================================================
  */
 
+#include <errno.h>
 #include "switch.h"
 
 #define DBUS_CALL_TIMEOUT 2000
-#define MAX_LAYOUTS_MAP_BUF 1024
 
 static const gchar *method_activate_head =
     "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
@@ -29,18 +29,15 @@ static const gsize method_activate_len =
     /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
     65 +       13 +       1 +                   3;
 
-struct value_search_data {
+struct value_search_data
+{
     const gchar *value;
     guintptr idx;
 };
 
-struct print_layouts_map_data {
-    gint written;
-    gchar *p;
-};
 
-
-static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused ) {
+static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused )
+{
     guintptr a, b;
 
     a = ( guintptr ) ap;
@@ -57,7 +54,8 @@ static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused ) {
 }
 
 
-static gint key_search( gconstpointer ap, gconstpointer bp ) {
+static gint key_search( gconstpointer ap, gconstpointer bp )
+{
     guintptr a, b;
 
     a = ( guintptr ) ap;
@@ -74,7 +72,8 @@ static gint key_search( gconstpointer ap, gconstpointer bp ) {
 }
 
 
-static gboolean value_search( gpointer k, gpointer v, gpointer data ) {
+static gboolean value_search( gpointer k, gpointer v, gpointer data )
+{
     guintptr key;
     gchar *value;
     struct value_search_data *vs;
@@ -94,37 +93,16 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data ) {
 }
 
 
-gboolean Xkb_Switch_printXkbLayouts( gpointer k, gpointer v, gpointer unused ) {
+gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
+{
     g_print( "%s\n", ( const char * ) v );
 
     return FALSE;
 }
 
 
-gboolean print_layouts_map( gpointer k, gpointer v, gpointer data ) {
-    guintptr key;
-    gchar *value;
-    struct print_layouts_map_data *pld;
-    gint w;
-
-    key = ( guintptr ) k;
-    value = ( gchar * ) v;
-    pld = ( struct print_layouts_map_data * ) data;
-
-    if ( pld->written >= MAX_LAYOUTS_MAP_BUF ) {
-        return FALSE;
-    }
-
-    w = g_snprintf( pld->p, MAX_LAYOUTS_MAP_BUF - pld->written, "%d:'%s',",
-                    ( gint ) key, ( const char * ) value );
-    pld->written += w;
-    pld->p += w;
-
-    return FALSE;
-}
-
-
-static inline GVariant *call_dbus( GDBusConnection *c, GVariant *param ) {
+static inline GVariant *call_dbus( GDBusConnection *c, GVariant *param )
+{
     return g_dbus_connection_call_sync( c,
                                         "org.gnome.Shell",
                                         "/org/gnome/Shell",
@@ -140,7 +118,8 @@ static inline GVariant *call_dbus( GDBusConnection *c, GVariant *param ) {
 }
 
 
-GTree *Xkb_Switch_buildXkbLayoutsMap() {
+GTree *g3kb_build_layouts_map( void )
+{
     GVariant *result = NULL;
     GVariant *vmethod = NULL;
     GVariant *vdict = NULL;
@@ -228,14 +207,12 @@ GTree *Xkb_Switch_buildXkbLayoutsMap() {
         v = NULL;
         while ( g_variant_iter_loop( iter2, "{ss}", &key, &value ) ) {
             if ( g_strcmp0( key, "key" ) == 0 ) {
-                guintptr idx;
-                if ( g_ascii_string_to_unsigned( value,
-                                                 10, 0,
-                                                 G3KB_SWITCH_MAX_LAYOUTS,
-                                                 &idx,
-                                                 NULL
-                                               ) )
-                {
+                guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
+                errno = 0;
+                /* weirdly, g_ascii_strtoull() and g_ascii_string_to_unsigned()
+                 * sometimes fail here with errno set to EAGAIN! */
+                idx = ( guintptr ) strtoull( value, NULL, 10 );
+                if ( errno == 0 && idx < G3KB_SWITCH_MAX_LAYOUTS ) {
                     k = ( gpointer ) idx;
                 } else {
                     g_variant_unref( vdict );
@@ -262,7 +239,8 @@ GTree *Xkb_Switch_buildXkbLayoutsMap() {
 }
 
 
-gchar *Xkb_Switch_getXkbLayoutRaw() {
+gchar *g3kb_get_layout( void )
+{
     GVariant *result = NULL;
     GVariant *vmethod = NULL;
     GVariant *param = NULL;
@@ -321,7 +299,8 @@ gchar *Xkb_Switch_getXkbLayoutRaw() {
 }
 
 
-gboolean Xkb_Switch_setXkbLayoutRaw( const gchar *value ) {
+gboolean g3kb_set_layout( const gchar *value )
+{
     GVariant *result = NULL;
     GVariant *vmethod = NULL;
     GVariant *param = NULL;
@@ -379,15 +358,13 @@ gboolean Xkb_Switch_setXkbLayoutRaw( const gchar *value ) {
 }
 
 
-gpointer Xkb_Switch_searchXkbLayout( GTree *layouts, gchar *layout ) {
+gpointer g3kb_search_layout( GTree *layouts, gchar *layout )
+{
     guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
 
-    if ( ! g_ascii_string_to_unsigned( layout,
-                                       10, 0, G3KB_SWITCH_MAX_LAYOUTS,
-                                       &idx,
-                                       NULL
-                                     ) )
-    {
+    errno = 0;
+    idx = ( guintptr ) strtoull( layout, NULL, 10 );
+    if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return NULL;
     }
 
@@ -395,7 +372,8 @@ gpointer Xkb_Switch_searchXkbLayout( GTree *layouts, gchar *layout ) {
 }
 
 
-guintptr Xkb_Switch_reverseSearchXkbLayout( GTree *layouts, gchar *layout ) {
+guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
+{
     struct value_search_data vs;
 
     vs.value = layout;
@@ -403,21 +381,5 @@ guintptr Xkb_Switch_reverseSearchXkbLayout( GTree *layouts, gchar *layout ) {
     g_tree_foreach( layouts, value_search, &vs );
 
     return vs.idx;
-}
-
-
-gchar *Xkb_Switch_getXkbLayoutsMap( GTree *layouts ) {
-    gchar dict[ MAX_LAYOUTS_MAP_BUF ];
-    struct print_layouts_map_data pld;
-
-    pld.written = 3;
-    pld.p = dict;
-
-    *pld.p++ = '{';
-    g_tree_foreach( layouts, print_layouts_map, &pld );
-    *pld.p++ = '}';
-    *pld.p = '\0';
-
-    return g_strdup( dict );
 }
 

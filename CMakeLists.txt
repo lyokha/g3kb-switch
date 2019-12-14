@@ -14,7 +14,7 @@ OPTION(BUILD_G3KBSWITCH_LIB
     "Build a library compatible with vim's libcall interface" ON)
 if(BUILD_G3KBSWITCH_LIB)
     SET(g3kblib g3kbswitch)
-    ADD_LIBRARY(${g3kblib} SHARED switch.c)
+    ADD_LIBRARY(${g3kblib} SHARED switch.c switch-api.c)
     TARGET_LINK_LIBRARIES(${g3kblib} ${GIO_LDFLAGS})
 endif()
 
