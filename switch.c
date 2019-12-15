@@ -19,15 +19,9 @@
 #include <errno.h>
 #include "switch.h"
 
-#define DBUS_CALL_TIMEOUT 2000
+#define G3KB_SWITCH_MAX_LAYOUTS 256
+#define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
 
-static const gchar *method_activate_head =
-    "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
-static const gchar *method_activate_tail =
-    "].activate()\"";
-static const gsize method_activate_len =
-    /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
-    65 +       13 +       1 +                   3;
 
 struct value_search_data
 {
@@ -101,43 +95,85 @@ gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
 }
 
 
-static inline GVariant *call_dbus( GDBusConnection *c, GVariant *param )
+static gboolean run_method( const gchar *method, gchar **value )
 {
-    return g_dbus_connection_call_sync( c,
-                                        "org.gnome.Shell",
-                                        "/org/gnome/Shell",
-                                        "org.gnome.Shell",
-                                        "Eval",
-                                        param,
-                                        NULL,
-                                        G_DBUS_CALL_FLAGS_NONE,
-                                        DBUS_CALL_TIMEOUT,
-                                        NULL,
-                                        NULL
-                                      );
+    GDBusConnection *c = NULL;
+    GVariant *result = NULL;
+    GVariant *vmethod = NULL;
+    GVariant *param = NULL;
+    GVariantBuilder builder;
+    gboolean success;
+
+    c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
+    if ( c == NULL ) {
+        return FALSE;
+    }
+
+    g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
+
+    vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
+    if ( vmethod == NULL ) {
+        g_object_unref( c );
+        return FALSE;
+    }
+
+    g_variant_builder_add_value( &builder, vmethod );
+
+    param = g_variant_builder_end( &builder );
+    if ( param == NULL ) {
+        g_object_unref( c );
+        return FALSE;
+    }
+
+    result = g_dbus_connection_call_sync( c,
+                                          "org.gnome.Shell",
+                                          "/org/gnome/Shell",
+                                          "org.gnome.Shell",
+                                          "Eval",
+                                          param,
+                                          NULL,
+                                          G_DBUS_CALL_FLAGS_NONE,
+                                          G3KB_SWITCH_DBUS_CALL_TIMEOUT,
+                                          NULL,
+                                          NULL
+                                        );
+
+    g_variant_unref( vmethod );
+    g_object_unref( c );
+
+    if ( result == NULL ) {
+        return FALSE;
+    }
+
+    if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
+        g_variant_unref( result );
+        return FALSE;
+    }
+
+    g_variant_get( result, "(bs)", &success, value );
+    if ( ! success ) {
+        if ( value ) {
+            g_free( *value );
+        }
+        g_variant_unref( result );
+        return FALSE;
+    }
+
+    g_variant_unref( result );
+
+    return TRUE;
 }
 
 
 GTree *g3kb_build_layouts_map( void )
 {
-    GVariant *result = NULL;
-    GVariant *vmethod = NULL;
     GVariant *vdict = NULL;
-    GVariant *param = NULL;
-    GVariantBuilder builder;
     GVariantIter iter1, *iter2;
     GTree *layouts = NULL;
     gchar *method = NULL;
-    gchar *res = NULL;
     gchar *key, *value;
     gpointer k, v;
-    gboolean success;
     gchar *dict = NULL;
-
-    GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if ( c == NULL ) {
-        return NULL;
-    }
 
     method = "\"ids = [];"
              "for (i in imports.ui.status.keyboard.getInputSourceManager()"
@@ -147,43 +183,9 @@ GTree *g3kb_build_layouts_map( void )
                          ".inputSources[i].id})};"
               "ids\"";
 
-    g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
-
-    vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
-    if ( vmethod == NULL ) {
-        g_object_unref( c );
+    if ( ! run_method( method, &dict ) ) {
         return NULL;
     }
-
-    g_variant_builder_add_value( &builder, vmethod );
-
-    param = g_variant_builder_end( &builder );
-    if ( param == NULL ) {
-        g_object_unref( c );
-        return NULL;
-    }
-
-    result = call_dbus( c, param );
-
-    g_variant_unref( vmethod );
-    g_object_unref( c );
-
-    if ( result == NULL ) {
-        return NULL;
-    }
-
-    if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
-        g_variant_unref( result );
-        return NULL;
-    }
-
-    g_variant_get( result, "(bs)", &success, &dict );
-    if ( ! success ) {
-        g_variant_unref( result );
-        return NULL;
-    }
-
-    g_variant_unref( result );
 
     vdict = g_variant_parse( NULL, dict, NULL, NULL, NULL );
     if ( vdict == NULL ) {
@@ -241,120 +243,40 @@ GTree *g3kb_build_layouts_map( void )
 
 gchar *g3kb_get_layout( void )
 {
-    GVariant *result = NULL;
-    GVariant *vmethod = NULL;
-    GVariant *param = NULL;
-    GVariantBuilder builder;
     gchar *method = NULL;
-    gboolean success;
     gchar *value = NULL;
-
-    GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if ( c == NULL ) {
-        return NULL;
-    }
 
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 
-    g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
-
-    vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
-    if ( vmethod == NULL ) {
-        g_object_unref( c );
+    if ( ! run_method( method, &value ) ) {
         return NULL;
     }
-
-    g_variant_builder_add_value( &builder, vmethod );
-
-    param = g_variant_builder_end( &builder );
-    if ( param == NULL ) {
-        g_object_unref( c );
-        return NULL;
-    }
-
-    result = call_dbus( c, param );
-
-    g_variant_unref( vmethod );
-    g_object_unref( c );
-
-    if ( result == NULL ) {
-        return NULL;
-    }
-
-    if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
-        g_variant_unref( result );
-        return NULL;
-    }
-
-    g_variant_get( result, "(bs)", &success, &value );
-    if ( ! success ) {
-        g_variant_unref( result );
-        return NULL;
-    }
-
-    g_variant_unref( result );
 
     return value;
 }
 
 
-gboolean g3kb_set_layout( const gchar *value )
+gboolean g3kb_set_layout( guint idx )
 {
-    GVariant *result = NULL;
-    GVariant *vmethod = NULL;
-    GVariant *param = NULL;
-    GVariantBuilder builder;
+    static const gchar *method_activate_head =
+        "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
+    static const gchar *method_activate_tail =
+        "].activate()\"";
+    static const gsize method_activate_len =
+        /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
+           65 +       13 +       1 +                   3;
+
     gchar method[ method_activate_len ];
-    gboolean success;
 
-    GDBusConnection *c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
-    if ( c == NULL ) {
+    if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return FALSE;
     }
 
-    g_snprintf( method, method_activate_len, "%s%.3s%s",
-                method_activate_head, value, method_activate_tail );
+    g_snprintf( method, method_activate_len, "%s%u%s",
+                method_activate_head, idx, method_activate_tail );
 
-    g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
-
-    vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
-    if ( vmethod == NULL ) {
-        g_object_unref( c );
-        return FALSE;
-    }
-
-    g_variant_builder_add_value( &builder, vmethod );
-
-    param = g_variant_builder_end( &builder );
-    if ( param == NULL ) {
-        g_object_unref( c );
-        return FALSE;
-    }
-
-    result = call_dbus( c, param );
-
-    g_variant_unref( vmethod );
-    g_object_unref( c );
-
-    if ( result == NULL ) {
-        return FALSE;
-    }
-
-    if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
-        g_variant_unref( result );
-        return FALSE;
-    }
-
-    g_variant_get( result, "(bs)", &success, NULL );
-    if ( ! success ) {
-        g_variant_unref( result );
-        return FALSE;
-    }
-
-    g_variant_unref( result );
-
-    return TRUE;
+    return run_method( method, NULL );
 }
 
 
@@ -377,9 +299,11 @@ guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
     struct value_search_data vs;
 
     vs.value = layout;
-
     g_tree_foreach( layouts, value_search, &vs );
 
+    /* BEWARE: may return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
+     * the returned value is supposed to be passed to g3kb_set_layout() later,
+     * this should not be a problem */
     return vs.idx;
 }
 

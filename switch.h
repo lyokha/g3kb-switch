@@ -21,13 +21,11 @@
 
 #include <gio/gio.h>
 
-#define G3KB_SWITCH_MAX_LAYOUTS 256
-
 
 gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer ignored );
 GTree *g3kb_build_layouts_map( void );
 gchar *g3kb_get_layout( void );
-gboolean g3kb_set_layout( const gchar *value );
+gboolean g3kb_set_layout( guint idx );
 gpointer g3kb_search_layout( GTree *layouts, gchar *layout );
 guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout );
 

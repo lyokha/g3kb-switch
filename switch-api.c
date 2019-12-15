@@ -24,7 +24,7 @@ GTree *layouts = NULL;
 
 const char *Xkb_Switch_getXkbLayout( const char *unused )
 {
-    gchar *layout_raw = NULL;
+    gchar *layout_idx = NULL;
     gpointer layout = NULL;
 
     if ( layouts == NULL ) {
@@ -34,18 +34,18 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
         }
     }
 
-    layout_raw = g3kb_get_layout();
-    if ( layout_raw == NULL ) {
+    layout_idx = g3kb_get_layout();
+    if ( layout_idx == NULL ) {
         return "";
     }
 
-    layout = g3kb_search_layout( layouts, layout_raw );
+    layout = g3kb_search_layout( layouts, layout_idx );
     if ( layout == NULL ) {
-        g_free( layout_raw );
+        g_free( layout_idx );
         return "";
     }
 
-    g_free( layout_raw );
+    g_free( layout_idx );
 
     return layout;
 }
@@ -53,8 +53,7 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
 
 const char *Xkb_Switch_setXkbLayout( const char *new_layout )
 {
-    guintptr idx;
-    gchar s_idx[ 3 ];
+    guint idx;
 
     if ( layouts == NULL ) {
         layouts = g3kb_build_layouts_map();
@@ -63,13 +62,8 @@ const char *Xkb_Switch_setXkbLayout( const char *new_layout )
         }
     }
 
-    idx = g3kb_reverse_search_layout( layouts, new_layout );
-    if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
-        return "";
-    }
-
-    g_snprintf( s_idx, 3, "%d", ( int ) idx );
-    if ( ! g3kb_set_layout( s_idx ) ) {
+    idx = ( guint ) g3kb_reverse_search_layout( layouts, new_layout );
+    if ( ! g3kb_set_layout( idx ) ) {
         return "";
     }
 
