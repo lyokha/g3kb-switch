@@ -241,19 +241,32 @@ GTree *g3kb_build_layouts_map( void )
 }
 
 
-gchar *g3kb_get_layout( void )
+guint g3kb_get_layout( void )
 {
     gchar *method = NULL;
     gchar *value = NULL;
+    guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
 
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 
     if ( ! run_method( method, &value ) ) {
-        return NULL;
+        return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
-    return value;
+    errno = 0;
+    idx = ( guintptr ) strtoull( value, NULL, 10 );
+    if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        g_free( value );
+        /* BEWARE: return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
+         * the returned value is supposed to be later passed to
+         * g3kb_search_layout(), this should not be a problem */
+        return G3KB_SWITCH_MAX_LAYOUTS;
+    }
+
+    g_free( value );
+
+    return ( guint ) idx;
 }
 
 
@@ -280,17 +293,11 @@ gboolean g3kb_set_layout( guint idx )
 }
 
 
-gpointer g3kb_search_layout( GTree *layouts, gchar *layout )
+gconstpointer g3kb_search_layout( GTree *layouts, guint idx )
 {
-    guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
+    guintptr layout_idx = ( guintptr ) idx;
 
-    errno = 0;
-    idx = ( guintptr ) strtoull( layout, NULL, 10 );
-    if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
-        return NULL;
-    }
-
-    return g_tree_search( layouts, key_search, ( gconstpointer ) idx );
+    return g_tree_search( layouts, key_search, ( gconstpointer ) layout_idx );
 }
 
 
@@ -302,8 +309,33 @@ guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
     g_tree_foreach( layouts, value_search, &vs );
 
     /* BEWARE: may return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
-     * the returned value is supposed to be passed to g3kb_set_layout() later,
+     * the returned value is supposed to be later passed to g3kb_set_layout(),
      * this should not be a problem */
     return vs.idx;
+}
+
+
+gconstpointer g3kb_safe_get_layout( GTree *layouts )
+{
+    guint idx;
+
+    idx = g3kb_get_layout();
+    if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        return NULL;
+    }
+
+    return g3kb_search_layout( layouts, idx );
+}
+
+gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout )
+{
+    guint idx;
+
+    idx = ( guint ) g3kb_reverse_search_layout( layouts, layout );
+    if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        return FALSE;
+    }
+
+    return g3kb_set_layout( idx );
 }
 

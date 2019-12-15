@@ -35,10 +35,8 @@ void usage( void )
 int main( int argc, char **argv )
 {
     GTree *layouts;
-    gchar *layout_idx = NULL;
     gchar *new_layout = NULL;
-    gpointer layout;
-    guint idx;
+    gconstpointer layout;
     gboolean print_layouts = FALSE;
     gboolean display_current_layout = FALSE;
     gboolean activate_new_layout = FALSE;
@@ -82,24 +80,15 @@ int main( int argc, char **argv )
     if ( print_layouts ) {
         g_tree_foreach( layouts, g3kb_print_layouts, NULL );
     } else if ( display_current_layout ) {
-        layout_idx = g3kb_get_layout();
-        if ( layout_idx == NULL ) {
-            g_printerr( "Failed to get current keyboard layout!\n" );
-            g_tree_unref( layouts );
-            exit( 1 );
-        }
-        layout = g3kb_search_layout( layouts, layout_idx );
+        layout = g3kb_safe_get_layout( layouts );
         if ( layout == NULL ) {
-            g_printerr( "Failed to find layout with index %s!\n", layout_idx );
-            g_free( layout_idx );
+            g_printerr( "Failed to find current layout!\n" );
             g_tree_unref( layouts );
             exit( 1 );
         }
         g_print( "%s\n", ( char * ) layout );
-        g_free( layout_idx );
     } else if ( activate_new_layout ) {
-        idx = ( guint ) g3kb_reverse_search_layout( layouts, new_layout );
-        if ( ! g3kb_set_layout( idx ) ) {
+        if ( ! g3kb_safe_set_layout( layouts, new_layout ) ) {
             g_printerr( "Failed to activate layout %s!\n", new_layout );
             g_tree_unref( layouts );
             exit( 1 );

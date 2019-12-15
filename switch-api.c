@@ -24,8 +24,7 @@ GTree *layouts = NULL;
 
 const char *Xkb_Switch_getXkbLayout( const char *unused )
 {
-    gchar *layout_idx = NULL;
-    gpointer layout = NULL;
+    gconstpointer layout = NULL;
 
     if ( layouts == NULL ) {
         layouts = g3kb_build_layouts_map();
@@ -34,27 +33,17 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
         }
     }
 
-    layout_idx = g3kb_get_layout();
-    if ( layout_idx == NULL ) {
-        return "";
-    }
-
-    layout = g3kb_search_layout( layouts, layout_idx );
+    layout = g3kb_safe_get_layout( layouts );
     if ( layout == NULL ) {
-        g_free( layout_idx );
         return "";
     }
-
-    g_free( layout_idx );
 
     return layout;
 }
 
 
-const char *Xkb_Switch_setXkbLayout( const char *new_layout )
+const char *Xkb_Switch_setXkbLayout( const char *layout )
 {
-    guint idx;
-
     if ( layouts == NULL ) {
         layouts = g3kb_build_layouts_map();
         if ( layouts == NULL ) {
@@ -62,8 +51,7 @@ const char *Xkb_Switch_setXkbLayout( const char *new_layout )
         }
     }
 
-    idx = ( guint ) g3kb_reverse_search_layout( layouts, new_layout );
-    if ( ! g3kb_set_layout( idx ) ) {
+    if ( ! g3kb_safe_set_layout( layouts, layout ) ) {
         return "";
     }
 

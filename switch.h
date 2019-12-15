@@ -24,10 +24,12 @@
 
 gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer ignored );
 GTree *g3kb_build_layouts_map( void );
-gchar *g3kb_get_layout( void );
+guint g3kb_get_layout( void );
 gboolean g3kb_set_layout( guint idx );
-gpointer g3kb_search_layout( GTree *layouts, gchar *layout );
+gconstpointer g3kb_search_layout( GTree *layouts, guint idx );
 guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout );
+gconstpointer g3kb_safe_get_layout( GTree *layouts );
+gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout );
 
 #endif  /* G3KB_SWITCH_H */
 
