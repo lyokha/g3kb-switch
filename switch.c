@@ -95,7 +95,7 @@ gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
 }
 
 
-static gboolean run_method( const gchar *method, gchar **value )
+static gboolean run_method( const gchar *method, gchar **value, GError **err )
 {
     GDBusConnection *c = NULL;
     GVariant *result = NULL;
@@ -104,7 +104,7 @@ static gboolean run_method( const gchar *method, gchar **value )
     GVariantBuilder builder;
     gboolean success;
 
-    c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, NULL );
+    c = g_bus_get_sync( G_BUS_TYPE_SESSION, NULL, err );
     if ( c == NULL ) {
         return FALSE;
     }
@@ -135,7 +135,7 @@ static gboolean run_method( const gchar *method, gchar **value )
                                           G_DBUS_CALL_FLAGS_NONE,
                                           G3KB_SWITCH_DBUS_CALL_TIMEOUT,
                                           NULL,
-                                          NULL
+                                          err
                                         );
 
     g_variant_unref( vmethod );
@@ -165,7 +165,7 @@ static gboolean run_method( const gchar *method, gchar **value )
 }
 
 
-GTree *g3kb_build_layouts_map( void )
+GTree *g3kb_build_layouts_map( GError **err )
 {
     GVariant *vdict = NULL;
     GVariantIter iter1, *iter2;
@@ -188,7 +188,7 @@ GTree *g3kb_build_layouts_map( void )
                          ".inputSources[i].id})};"
               "ids\"";
 
-    if ( ! run_method( method, &dict ) ) {
+    if ( ! run_method( method, &dict, err ) ) {
         return NULL;
     }
 
@@ -255,7 +255,7 @@ guint g3kb_get_layout( void )
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 
-    if ( ! run_method( method, &value ) ) {
+    if ( ! run_method( method, &value, NULL ) ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
@@ -296,7 +296,7 @@ gboolean g3kb_set_layout( guint idx )
     g_snprintf( method, method_activate_len, "%s%u%s",
                 method_activate_head, idx, method_activate_tail );
 
-    return run_method( method, NULL );
+    return run_method( method, NULL, NULL );
 }
 
 

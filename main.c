@@ -41,6 +41,7 @@ int main( int argc, char **argv )
     gboolean print_layouts = FALSE;
     gboolean display_current_layout = FALSE;
     gboolean activate_new_layout = FALSE;
+    GError *err = NULL;
 
     if ( argc > 1 ) {
         if ( g_strcmp0( argv[ 1 ], "-h" ) == 0 ||
@@ -72,9 +73,13 @@ int main( int argc, char **argv )
         display_current_layout = TRUE;
     }
 
-    layouts = g3kb_build_layouts_map();
+    layouts = g3kb_build_layouts_map( &err );
     if ( layouts == NULL ) {
         g_printerr( "Failed to build keyboard layouts map!\n" );
+        if ( err ) {
+            g_printerr( "Error details: %s\n", err->message );
+            g_error_free( err );
+        }
         exit( 1 );
     }
 

@@ -27,7 +27,7 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
     gconstpointer layout = NULL;
 
     if ( layouts == NULL ) {
-        layouts = g3kb_build_layouts_map();
+        layouts = g3kb_build_layouts_map( NULL );
         if ( layouts == NULL ) {
             return "";
         }
@@ -45,7 +45,7 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
 const char *Xkb_Switch_setXkbLayout( const char *layout )
 {
     if ( layouts == NULL ) {
-        layouts = g3kb_build_layouts_map();
+        layouts = g3kb_build_layouts_map( NULL );
         if ( layouts == NULL ) {
             return "";
         }

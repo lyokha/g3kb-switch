@@ -24,7 +24,7 @@
 
 /* layouts map translates indexes (of type guintptr) to layout ids (gchar *) */
 gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer ignored );
-GTree *g3kb_build_layouts_map( void );
+GTree *g3kb_build_layouts_map( GError **err );
 
 /* this interface exposes indexes inside the layouts map */
 guint g3kb_get_layout( void );
