@@ -21,6 +21,7 @@
 
 #define G3KB_SWITCH_MAX_LAYOUTS 256
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
+#define G3KB_QUARK 1
 
 
 struct value_search_data
@@ -113,6 +114,7 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
 
     vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
     if ( vmethod == NULL ) {
+        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to parse method" );
         g_object_unref( c );
         return FALSE;
     }
@@ -121,6 +123,7 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
 
     param = g_variant_builder_end( &builder );
     if ( param == NULL ) {
+        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to build param" );
         g_object_unref( c );
         return FALSE;
     }
@@ -146,6 +149,8 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
     }
 
     if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
+        *err = g_error_new_literal( G3KB_QUARK, 0,
+                                    "Unexpected type of response" );
         g_variant_unref( result );
         return FALSE;
     }
@@ -155,6 +160,8 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
         if ( value ) {
             g_free( *value );
         }
+        *err = g_error_new_literal( G3KB_QUARK, 0,
+                                    "Failed to parse response value" );
         g_variant_unref( result );
         return FALSE;
     }
@@ -194,6 +201,7 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     vdict = g_variant_parse( NULL, dict, NULL, NULL, NULL );
     if ( vdict == NULL ) {
+        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to parse dict" );
         g_free( dict );
         return NULL;
     }
@@ -201,8 +209,9 @@ GTree *g3kb_build_layouts_map( GError **err )
     g_free( dict );
 
     if ( ! g_variant_is_of_type( vdict, G_VARIANT_TYPE( "aa{ss}" ) ) ) {
-        return NULL;
+        *err = g_error_new_literal( G3KB_QUARK, 0, "Unexpected type of dict" );
         g_variant_unref( vdict );
+        return NULL;
     }
 
     layouts = g_tree_new_full( ( GCompareDataFunc ) key_cmp,
@@ -222,6 +231,8 @@ GTree *g3kb_build_layouts_map( GError **err )
                 if ( errno == 0 && idx < G3KB_SWITCH_MAX_LAYOUTS ) {
                     k = ( gpointer ) idx;
                 } else {
+                    *err = g_error_new_literal( G3KB_QUARK, 0,
+                                                "Failed to read key as index" );
                     g_variant_unref( vdict );
                     g_tree_unref( layouts );
                     return NULL;
