@@ -175,6 +175,11 @@ GTree *g3kb_build_layouts_map( void )
     gpointer k, v;
     gchar *dict = NULL;
 
+    /* BEWARE: g3kb_get_layout() takes currentSource.index while here we simply
+     * put counter i as the value of the key when iterating inputSources, this
+     * should be correct as soon as currentSource.index drives iteration
+     * order; to ensure correctness we could also put inputSources[i].index
+     * instead of i */
     method = "\"ids = [];"
              "for (i in imports.ui.status.keyboard.getInputSourceManager()"
                  ".inputSources){"
