@@ -32,6 +32,7 @@ void usage( void )
              "       g3kb-switch [-p]      Displays current layout group\n" );
 }
 
+
 int main( int argc, char **argv )
 {
     GTree *layouts;

@@ -7,7 +7,7 @@ interface but rather implements direct D-Bus messaging with the Gnome Shell.
 Installation
 ------------
 
-Build as a normal user.
+Build as a regular user.
 
 ```ShellSession
     $ mkdir build && cd build

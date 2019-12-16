@@ -38,7 +38,7 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
         return "";
     }
 
-    return layout;
+    return ( const char * ) layout;
 }
 
 

@@ -170,7 +170,7 @@ GTree *g3kb_build_layouts_map( void )
     GVariant *vdict = NULL;
     GVariantIter iter1, *iter2;
     GTree *layouts = NULL;
-    gchar *method = NULL;
+    const gchar *method = NULL;
     gchar *key, *value;
     gpointer k, v;
     gchar *dict = NULL;
@@ -243,7 +243,7 @@ GTree *g3kb_build_layouts_map( void )
 
 guint g3kb_get_layout( void )
 {
-    gchar *method = NULL;
+    const gchar *method = NULL;
     gchar *value = NULL;
     guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
 
@@ -255,6 +255,8 @@ guint g3kb_get_layout( void )
     }
 
     errno = 0;
+    /* see why we do not use g_ascii_strtoull() or g_ascii_string_to_unsigned()
+     * in a comment inside g3kb_build_layouts_map() */
     idx = ( guintptr ) strtoull( value, NULL, 10 );
     if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         g_free( value );
@@ -326,6 +328,7 @@ gconstpointer g3kb_safe_get_layout( GTree *layouts )
 
     return g3kb_search_layout( layouts, idx );
 }
+
 
 gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout )
 {
