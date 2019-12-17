@@ -16,12 +16,24 @@
  * =============================================================================
  */
 
+#include <glib.h>
 #include <errno.h>
+
 #include "switch.h"
 
 #define G3KB_SWITCH_MAX_LAYOUTS 256
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
-#define G3KB_QUARK 1
+
+#define G3KB_SWITCH_ERROR g3kb_switch_error()
+#define G3KB_SWITCH_ERROR_RUN_METHOD 1
+#define G3KB_SWITCH_ERROR_LAYOUTS_MAP 2
+#define G3KB_SWITCH_ERROR_GET_LAYOUT 3
+#define G3KB_SWITCH_ERROR_SET_LAYOUT 4
+
+
+GQuark g3kb_switch_error( void ) {
+    return g_quark_from_static_string( "g3kb-switch-error-quark" );
+}
 
 
 struct value_search_data
@@ -114,7 +126,8 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
 
     vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
     if ( vmethod == NULL ) {
-        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to parse method" );
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                     "Failed to parse input method" );
         g_object_unref( c );
         return FALSE;
     }
@@ -123,7 +136,8 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
 
     param = g_variant_builder_end( &builder );
     if ( param == NULL ) {
-        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to build param" );
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                     "Failed to build call parameter" );
         g_object_unref( c );
         return FALSE;
     }
@@ -149,19 +163,20 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
     }
 
     if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
-        *err = g_error_new_literal( G3KB_QUARK, 0,
-                                    "Unexpected type of response" );
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                     "Unexpected response type" );
         g_variant_unref( result );
         return FALSE;
     }
 
     g_variant_get( result, "(bs)", &success, value );
     if ( ! success ) {
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                     "Bad response: %s",
+                     value == NULL || *value == NULL ? "<empty>" : *value );
         if ( value ) {
             g_free( *value );
         }
-        *err = g_error_new_literal( G3KB_QUARK, 0,
-                                    "Failed to parse response value" );
         g_variant_unref( result );
         return FALSE;
     }
@@ -188,9 +203,9 @@ GTree *g3kb_build_layouts_map( GError **err )
      * order; to ensure correctness we could also put inputSources[i].index
      * instead of i */
     method = "\"var ids=[];"
-             "for (var i in imports.ui.status.keyboard.getInputSourceManager()"
+             "for(var i in imports.ui.status.keyboard.getInputSourceManager()"
                  ".inputSources){"
-                 "ids.push({key:i, value:"
+                 "ids.push({key:i,value:"
                      "imports.ui.status.keyboard.getInputSourceManager()"
                          ".inputSources[i].id})};"
               "ids\"";
@@ -201,7 +216,8 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     vdict = g_variant_parse( NULL, dict, NULL, NULL, NULL );
     if ( vdict == NULL ) {
-        *err = g_error_new_literal( G3KB_QUARK, 0, "Failed to parse dict" );
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+                     "Failed to parse response value" );
         g_free( dict );
         return NULL;
     }
@@ -209,7 +225,8 @@ GTree *g3kb_build_layouts_map( GError **err )
     g_free( dict );
 
     if ( ! g_variant_is_of_type( vdict, G_VARIANT_TYPE( "aa{ss}" ) ) ) {
-        *err = g_error_new_literal( G3KB_QUARK, 0, "Unexpected type of dict" );
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+                     "Unexpected type of response value" );
         g_variant_unref( vdict );
         return NULL;
     }
@@ -231,8 +248,10 @@ GTree *g3kb_build_layouts_map( GError **err )
                 if ( errno == 0 && idx < G3KB_SWITCH_MAX_LAYOUTS ) {
                     k = ( gpointer ) idx;
                 } else {
-                    *err = g_error_new_literal( G3KB_QUARK, 0,
-                                                "Failed to read key as index" );
+                    g_set_error( err, G3KB_SWITCH_ERROR,
+                                 G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+                                 "Key %s is not a valid index",
+                                 value == NULL ? "<empty>" : value );
                     g_variant_unref( vdict );
                     g_tree_unref( layouts );
                     return NULL;
@@ -257,7 +276,7 @@ GTree *g3kb_build_layouts_map( GError **err )
 }
 
 
-guint g3kb_get_layout( void )
+guint g3kb_get_layout( GError **err )
 {
     const gchar *method = NULL;
     gchar *value = NULL;
@@ -266,7 +285,7 @@ guint g3kb_get_layout( void )
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 
-    if ( ! run_method( method, &value, NULL ) ) {
+    if ( ! run_method( method, &value, err ) ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
@@ -275,6 +294,9 @@ guint g3kb_get_layout( void )
      * in a comment inside g3kb_build_layouts_map() */
     idx = ( guintptr ) strtoull( value, NULL, 10 );
     if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_GET_LAYOUT,
+                     "Key %s is not a valid index",
+                     value == NULL ? "<empty>" : value );
         g_free( value );
         /* BEWARE: return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
          * the returned value is supposed to be later passed to
@@ -288,7 +310,7 @@ guint g3kb_get_layout( void )
 }
 
 
-gboolean g3kb_set_layout( guint idx )
+gboolean g3kb_set_layout( guint idx, GError **err )
 {
     static const gchar *method_activate_head =
         "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
@@ -301,13 +323,15 @@ gboolean g3kb_set_layout( guint idx )
     gchar method[ method_activate_len ];
 
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_SET_LAYOUT,
+                     "Index %u is not valid", idx );
         return FALSE;
     }
 
     g_snprintf( method, method_activate_len, "%s%u%s",
                 method_activate_head, idx, method_activate_tail );
 
-    return run_method( method, NULL, NULL );
+    return run_method( method, NULL, err );
 }
 
 
@@ -333,11 +357,11 @@ guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
 }
 
 
-gconstpointer g3kb_safe_get_layout( GTree *layouts )
+gconstpointer g3kb_safe_get_layout( GTree *layouts, GError **err )
 {
     guint idx;
 
-    idx = g3kb_get_layout();
+    idx = g3kb_get_layout( err );
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return NULL;
     }
@@ -346,7 +370,8 @@ gconstpointer g3kb_safe_get_layout( GTree *layouts )
 }
 
 
-gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout )
+gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
+                               GError **err )
 {
     guint idx;
 
@@ -355,6 +380,6 @@ gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout )
         return FALSE;
     }
 
-    return g3kb_set_layout( idx );
+    return g3kb_set_layout( idx, err );
 }
 

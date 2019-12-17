@@ -33,7 +33,7 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
         }
     }
 
-    layout = g3kb_safe_get_layout( layouts );
+    layout = g3kb_safe_get_layout( layouts, NULL );
     if ( layout == NULL ) {
         return "";
     }
@@ -51,7 +51,7 @@ const char *Xkb_Switch_setXkbLayout( const char *layout )
         }
     }
 
-    if ( ! g3kb_safe_set_layout( layouts, layout ) ) {
+    if ( ! g3kb_safe_set_layout( layouts, layout, NULL ) ) {
         return "";
     }
 

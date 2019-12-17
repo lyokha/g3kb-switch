@@ -75,27 +75,29 @@ int main( int argc, char **argv )
 
     layouts = g3kb_build_layouts_map( &err );
     if ( layouts == NULL ) {
-        g_printerr( "Failed to build keyboard layouts map!\n" );
-        if ( err ) {
-            g_printerr( "Error details: %s\n", err->message );
-            g_error_free( err );
-        }
+        g_printerr( "Failed to build keyboard layouts map: %s\n",
+                    err == NULL ? "<no details>" : err->message );
+        g_clear_error( &err );
         exit( 1 );
     }
 
     if ( print_layouts ) {
         g_tree_foreach( layouts, g3kb_print_layouts, NULL );
     } else if ( display_current_layout ) {
-        layout = g3kb_safe_get_layout( layouts );
+        layout = g3kb_safe_get_layout( layouts, &err );
         if ( layout == NULL ) {
-            g_printerr( "Failed to find current layout!\n" );
+            g_printerr( "Failed to find current layout: %s\n",
+                        err == NULL ? "<no details>" : err->message );
+            g_clear_error( &err );
             g_tree_unref( layouts );
             exit( 1 );
         }
         g_print( "%s\n", ( char * ) layout );
     } else if ( activate_new_layout ) {
-        if ( ! g3kb_safe_set_layout( layouts, new_layout ) ) {
-            g_printerr( "Failed to activate layout %s!\n", new_layout );
+        if ( ! g3kb_safe_set_layout( layouts, new_layout, &err ) ) {
+            g_printerr( "Failed to activate layout %s: %s\n", new_layout,
+                        err == NULL ? "<no details>" : err->message );
+            g_clear_error( &err );
             g_tree_unref( layouts );
             exit( 1 );
         }
