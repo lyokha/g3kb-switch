@@ -31,7 +31,7 @@
 #define G3KB_SWITCH_ERROR_SET_LAYOUT 4
 
 
-GQuark g3kb_switch_error( void ) {
+static GQuark g3kb_switch_error( void ) {
     return g_quark_from_static_string( "g3kb-switch-error-quark" );
 }
 
