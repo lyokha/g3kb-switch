@@ -187,8 +187,8 @@ GTree *g3kb_build_layouts_map( GError **err )
      * should be correct as soon as currentSource.index drives iteration
      * order; to ensure correctness we could also put inputSources[i].index
      * instead of i */
-    method = "\"ids = [];"
-             "for (i in imports.ui.status.keyboard.getInputSourceManager()"
+    method = "\"var ids=[];"
+             "for (var i in imports.ui.status.keyboard.getInputSourceManager()"
                  ".inputSources){"
                  "ids.push({key:i, value:"
                      "imports.ui.status.keyboard.getInputSourceManager()"
