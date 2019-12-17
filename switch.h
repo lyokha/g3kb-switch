@@ -19,7 +19,7 @@
 #ifndef G3KB_SWITCH_H
 #define G3KB_SWITCH_H
 
-#include <gio/gio.h>
+#include <glib.h>
 
 
 /* layouts map translates indexes (of type guintptr) to layout ids (gchar *) */

@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+
 #include "switch.h"
 
 #define VERSION_MAJ 0

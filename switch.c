@@ -16,7 +16,7 @@
  * =============================================================================
  */
 
-#include <glib.h>
+#include <gio/gio.h>
 #include <errno.h>
 
 #include "switch.h"
@@ -31,16 +31,17 @@
 #define G3KB_SWITCH_ERROR_SET_LAYOUT 4
 
 
-static GQuark g3kb_switch_error( void ) {
-    return g_quark_from_static_string( "g3kb-switch-error-quark" );
-}
-
-
 struct value_search_data
 {
     const gchar *value;
     guintptr idx;
 };
+
+
+static GQuark g3kb_switch_error( void )
+{
+    return g_quark_from_static_string( "g3kb-switch-error-quark" );
+}
 
 
 static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused )
