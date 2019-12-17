@@ -7,18 +7,35 @@ interface but rather implements direct D-Bus messaging with the Gnome Shell.
 Installation
 ------------
 
-Build as a regular user.
+Build requires *glib-2.0*, so you need to install the corresponding development
+package.
+
+*In Ubuntu.*
 
 ```ShellSession
-    $ mkdir build && cd build
-    $ cmake ..
-    $ make
+$ sudo apt-get install libglib2.0-dev
+```
+
+*In Fedora.*
+
+```ShellSession
+# dnf install glib2-devel
+```
+
+Commands may slightly differ in other Linux distributions.
+
+Now build the program as a regular user.
+
+```ShellSession
+$ mkdir build && cd build
+$ cmake ..
+$ make
 ```
 
 Install being a superuser.
 
 ```ShellSession
-    # make install
+# make install
 ```
 
 Usage
