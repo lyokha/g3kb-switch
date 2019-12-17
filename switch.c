@@ -209,7 +209,7 @@ GTree *g3kb_build_layouts_map( GError **err )
                  "ids.push({key:i,value:"
                      "imports.ui.status.keyboard.getInputSourceManager()"
                          ".inputSources[i].id})};"
-              "ids\"";
+             "ids\"";
 
     if ( ! run_method( method, &dict, err ) ) {
         return NULL;
