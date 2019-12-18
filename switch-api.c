@@ -19,7 +19,7 @@
 #include "switch.h"
 
 
-GTree *layouts = NULL;
+static GTree *layouts = NULL;
 
 
 const char *Xkb_Switch_getXkbLayout( const char *unused )

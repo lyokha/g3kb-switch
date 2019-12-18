@@ -16,13 +16,13 @@ package.
 $ sudo apt-get install libglib2.0-dev
 ```
 
-*In Fedora.*
+*In Fedora / RHEL / CentOS.*
 
 ```ShellSession
 # dnf install glib2-devel
 ```
 
-Commands may slightly differ in other Linux distributions.
+Commands may differ in other Linux distributions.
 
 Now build the program as a regular user.
 
