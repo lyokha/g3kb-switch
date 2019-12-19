@@ -53,12 +53,12 @@ static GQuark g3kb_switch_error( void )
 }
 
 
-static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused )
+static gint key_cmp( gconstpointer k1, gconstpointer k2, gpointer unused )
 {
     guintptr a, b;
 
-    a = ( guintptr ) ap;
-    b = ( guintptr ) bp;
+    a = ( guintptr ) k1;
+    b = ( guintptr ) k2;
 
     if ( a > b ) {
         return 1;
@@ -71,12 +71,12 @@ static gint key_cmp( gconstpointer ap, gconstpointer bp, gpointer unused )
 }
 
 
-static gint key_search( gconstpointer ap, gconstpointer bp )
+static gint key_search( gconstpointer k1, gconstpointer k2 )
 {
     guintptr a, b;
 
-    a = ( guintptr ) ap;
-    b = ( guintptr ) bp;
+    a = ( guintptr ) k1;
+    b = ( guintptr ) k2;
 
     if ( a > b ) {
         return -1;
@@ -110,7 +110,7 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data )
 }
 
 
-static gboolean next_key_search( gpointer k, gpointer v, gpointer data )
+static gboolean next_key_search( gpointer k, gpointer unused, gpointer data )
 {
     guintptr key;
     struct next_key_search_data *nks;
