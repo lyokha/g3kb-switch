@@ -16,12 +16,10 @@
  * =============================================================================
  */
 
-#include <stdlib.h>
-
 #include "switch.h"
 
 #define VERSION_MAJ 0
-#define VERSION_MIN 1
+#define VERSION_MIN 2
 
 
 void usage( void )
@@ -30,6 +28,7 @@ void usage( void )
              "       g3kb-switch -l        Displays all layout groups\n"
              "       g3kb-switch -h        Displays this message\n"
              "       g3kb-switch -v        Shows version number\n"
+             "       g3kb-switch -n        Switch to the next layout group\n"
              "       g3kb-switch [-p]      Displays current layout group\n" );
 }
 
@@ -42,6 +41,7 @@ int main( int argc, char **argv )
     gboolean print_layouts = FALSE;
     gboolean display_current_layout = FALSE;
     gboolean activate_new_layout = FALSE;
+    gboolean activate_next_layout = FALSE;
     GError *err = NULL;
 
     if ( argc > 1 ) {
@@ -69,6 +69,11 @@ int main( int argc, char **argv )
             }
             activate_new_layout = TRUE;
             new_layout = argv[ 2 ];
+        } else if ( g_strcmp0( argv[ 1 ], "-n" ) == 0 ) {
+            activate_next_layout = TRUE;
+        } else {
+            usage ();
+            return 1;
         }
     } else {
         display_current_layout = TRUE;
@@ -79,7 +84,7 @@ int main( int argc, char **argv )
         g_printerr( "Failed to build keyboard layouts map: %s\n",
                     err == NULL ? "<no details>" : err->message );
         g_clear_error( &err );
-        exit( 1 );
+        return 1;
     }
 
     if ( print_layouts ) {
@@ -91,7 +96,7 @@ int main( int argc, char **argv )
                         err == NULL ? "<no details>" : err->message );
             g_clear_error( &err );
             g_tree_unref( layouts );
-            exit( 1 );
+            return 1;
         }
         g_print( "%s\n", ( char * ) layout );
     } else if ( activate_new_layout ) {
@@ -100,7 +105,15 @@ int main( int argc, char **argv )
                         err == NULL ? "<no details>" : err->message );
             g_clear_error( &err );
             g_tree_unref( layouts );
-            exit( 1 );
+            return 1;
+        }
+    } else if ( activate_next_layout ) {
+        if ( ! g3kb_set_next_layout( layouts, &err ) ) {
+            g_printerr( "Failed to activate next layout: %s\n",
+                        err == NULL ? "<no details>" : err->message );
+            g_clear_error( &err );
+            g_tree_unref( layouts );
+            return 1;
         }
     }
 

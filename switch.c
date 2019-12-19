@@ -38,6 +38,15 @@ struct value_search_data
 };
 
 
+struct next_key_search_data
+{
+    guintptr key;
+    guintptr first;
+    guintptr next;
+    gboolean found;
+};
+
+
 static GQuark g3kb_switch_error( void )
 {
     return g_quark_from_static_string( "g3kb-switch-error-quark" );
@@ -95,6 +104,29 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data )
     if ( g_strcmp0( vs->value, value ) == 0 ) {
         vs->idx = key;
         return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+static gboolean next_key_search( gpointer k, gpointer v, gpointer data )
+{
+    guintptr key;
+    struct next_key_search_data *nks;
+
+    key = ( guintptr ) k;
+    nks = ( struct next_key_search_data * ) data;
+
+    if ( nks->first == G3KB_SWITCH_MAX_LAYOUTS ) {
+        nks->first = key;
+    }
+    if ( nks->found ) {
+        nks->next = key;
+        return TRUE;
+    }
+    if ( key == nks->key ) {
+        nks->found = TRUE;
     }
 
     return FALSE;
@@ -377,6 +409,45 @@ gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
     guint idx;
 
     idx = ( guint ) g3kb_reverse_search_layout( layouts, layout );
+    if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        return FALSE;
+    }
+
+    return g3kb_set_layout( idx, err );
+}
+
+
+guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
+{
+    struct next_key_search_data nks;
+
+    /* BEWARE: may return invalid value G3KB_SWIkCH_MAX_LAYOUTS, but as far as
+     * the returned value is supposed to be later passed to
+     * g3kb_set_next_layout(), this should not be a problem */
+
+    nks.key = ( guintptr ) g3kb_get_layout( err );
+    if ( nks.key >= G3KB_SWITCH_MAX_LAYOUTS ) {
+        return G3KB_SWITCH_MAX_LAYOUTS;
+    }
+
+    nks.first = G3KB_SWITCH_MAX_LAYOUTS;
+    nks.next = G3KB_SWITCH_MAX_LAYOUTS;
+    nks.found = FALSE;
+    g_tree_foreach( layouts, next_key_search, &nks );
+
+    if ( nks.next != G3KB_SWITCH_MAX_LAYOUTS ) {
+        return nks.next;
+    }
+
+    return nks.first;
+}
+
+
+gboolean g3kb_set_next_layout( GTree *layouts, GError **err )
+{
+    guint idx;
+
+    idx = ( guint ) g3kb_get_next_layout( layouts, err );
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return FALSE;
     }

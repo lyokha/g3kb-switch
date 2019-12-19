@@ -37,5 +37,9 @@ gconstpointer g3kb_safe_get_layout( GTree *layouts, GError **err );
 gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
                                GError **err );
 
+/* getting and setting the next layout */
+guintptr g3kb_get_next_layout( GTree *layouts, GError **err );
+gboolean g3kb_set_next_layout( GTree *layouts, GError **err );
+
 #endif  /* G3KB_SWITCH_H */
 
