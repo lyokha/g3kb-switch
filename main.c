@@ -55,14 +55,11 @@ int main( int argc, char **argv )
         {
             g_print( "g3kb-switch version %d.%d\n", VERSION_MAJ, VERSION_MIN );
             return 0;
-        } else if ( g_strcmp0( argv[ 1 ], "-l" ) == 0 )
-        {
+        } else if ( g_strcmp0( argv[ 1 ], "-l" ) == 0 ) {
             print_layouts = TRUE;
-        } else if ( g_strcmp0( argv[ 1 ], "-p" ) == 0 )
-        {
+        } else if ( g_strcmp0( argv[ 1 ], "-p" ) == 0 ) {
             display_current_layout = TRUE;
-        } else if ( g_strcmp0( argv[ 1 ], "-s" ) == 0 )
-        {
+        } else if ( g_strcmp0( argv[ 1 ], "-s" ) == 0 ) {
             if ( argc < 3 ) {
                 usage ();
                 return 1;
