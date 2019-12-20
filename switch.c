@@ -52,7 +52,8 @@ static GQuark g3kb_switch_error( void )
 }
 
 
-static gint key_cmp( gconstpointer k1, gconstpointer k2, gpointer unused )
+/* compare two guintptr values */
+static gint key_compare( gconstpointer k1, gconstpointer k2, gpointer unused )
 {
     guintptr a, b;
 
@@ -67,24 +68,6 @@ static gint key_cmp( gconstpointer k1, gconstpointer k2, gpointer unused )
     }
 
     return -1;  /* if a < b */
-}
-
-
-static gint key_search( gconstpointer k1, gconstpointer k2 )
-{
-    guintptr a, b;
-
-    a = ( guintptr ) k1;
-    b = ( guintptr ) k2;
-
-    if ( a > b ) {
-        return -1;
-    }
-    if ( a == b ) {
-        return 0;
-    }
-
-    return 1;  /* if a < b */
 }
 
 
@@ -263,8 +246,7 @@ GTree *g3kb_build_layouts_map( GError **err )
         return NULL;
     }
 
-    layouts = g_tree_new_full( ( GCompareDataFunc ) key_cmp,
-                               NULL, NULL, g_free );
+    layouts = g_tree_new_full( key_compare, NULL, NULL, g_free );
 
     g_variant_iter_init( &iter1, vdict );
     while ( g_variant_iter_loop( &iter1, "a{ss}", &iter2 ) ) {
@@ -371,7 +353,7 @@ gconstpointer g3kb_search_layout( GTree *layouts, guint idx )
 {
     guintptr layout_idx = ( guintptr ) idx;
 
-    return g_tree_search( layouts, key_search, ( gconstpointer ) layout_idx );
+    return g_tree_lookup( layouts, ( gconstpointer ) layout_idx );
 }
 
 
