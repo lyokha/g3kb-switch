@@ -25,8 +25,9 @@
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
 
 #define G3KB_SWITCH_ERROR g3kb_switch_error()
+
 #define G3KB_SWITCH_ERROR_RUN_METHOD 1
-#define G3KB_SWITCH_ERROR_LAYOUTS_MAP 2
+#define G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP 2
 #define G3KB_SWITCH_ERROR_GET_LAYOUT 3
 #define G3KB_SWITCH_ERROR_SET_LAYOUT 4
 
@@ -231,7 +232,8 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     vdict = g_variant_parse( NULL, dict, NULL, NULL, NULL );
     if ( vdict == NULL ) {
-        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+        g_set_error( err, G3KB_SWITCH_ERROR,
+                     G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
                      "Failed to parse response value" );
         g_free( dict );
         return NULL;
@@ -240,7 +242,8 @@ GTree *g3kb_build_layouts_map( GError **err )
     g_free( dict );
 
     if ( ! g_variant_is_of_type( vdict, G_VARIANT_TYPE( "aa{ss}" ) ) ) {
-        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+        g_set_error( err, G3KB_SWITCH_ERROR,
+                     G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
                      "Unexpected type of response value" );
         g_variant_unref( vdict );
         return NULL;
@@ -263,7 +266,7 @@ GTree *g3kb_build_layouts_map( GError **err )
                     k = ( gpointer ) idx;
                 } else {
                     g_set_error( err, G3KB_SWITCH_ERROR,
-                                 G3KB_SWITCH_ERROR_LAYOUTS_MAP,
+                                 G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
                                  "Key %s is not a valid index",
                                  value == NULL ? "<empty>" : value );
                     g_variant_unref( vdict );
