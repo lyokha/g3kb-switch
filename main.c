@@ -31,10 +31,10 @@ void version( void )
 void usage( void )
 {
     version();
-    g_print( "Usage: g3kb-switch [-p]      Show current layout group\n"
-             "       g3kb-switch -l        Show all layout groups\n"
+    g_print( "Usage: g3kb-switch [-p]      Show the current layout group\n"
+             "       g3kb-switch -l        Show available layout groups\n"
              "       g3kb-switch -n        Switch to the next layout group\n"
-             "       g3kb-switch -s ARG    Set current layout group to ARG\n"
+             "       g3kb-switch -s ARG    Switch to layout group ARG\n"
              "       g3kb-switch -h        Show this message and exit\n"
              "       g3kb-switch -v        Show program version and exit\n" );
 }

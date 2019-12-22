@@ -28,7 +28,7 @@ Now build the program as a regular user.
 
 ```ShellSession
 $ mkdir build && cd build
-$ cmake ..
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ make
 ```
 
@@ -42,10 +42,10 @@ Usage
 -----
 
 ```ShellSession
-Usage: g3kb-switch [-p]      Show current layout group
-       g3kb-switch -l        Show all layout groups
+Usage: g3kb-switch [-p]      Show the current layout group
+       g3kb-switch -l        Show available layout groups
        g3kb-switch -n        Switch to the next layout group
-       g3kb-switch -s ARG    Set current layout group to ARG
+       g3kb-switch -s ARG    Switch to layout group ARG
        g3kb-switch -h        Show this message and exit
        g3kb-switch -v        Show program version and exit
 ```
