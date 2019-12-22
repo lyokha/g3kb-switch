@@ -11,17 +11,25 @@ INCLUDE_DIRECTORIES(${GIO_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(${name} ${GIO_LDFLAGS})
 #TARGET_COMPILE_OPTIONS(${name} PUBLIC -g -Wall)
 
-OPTION(BUILD_G3KBSWITCH_LIB
-    "Build a library compatible with vim's libcall interface" ON)
-if(BUILD_G3KBSWITCH_LIB)
+OPTION(BUILD_G3KBSWITCH_LIB "Build plugin for vim-xkbswitch" ON)
+IF(BUILD_G3KBSWITCH_LIB)
     SET(g3kblib g3kbswitch)
     ADD_LIBRARY(${g3kblib} SHARED switch.c switch-api.c)
     TARGET_LINK_LIBRARIES(${g3kblib} ${GIO_LDFLAGS})
     #TARGET_COMPILE_OPTIONS(${g3kblib} PUBLIC -g -Wall)
-endif()
+ENDIF()
+
+OPTION(INSTALL_G3KBSWITCH_BASH_COMPLETION "Install bash completion script" ON)
+IF(INSTALL_G3KBSWITCH_BASH_COMPLETION)
+    FIND_PACKAGE(bash-completion)
+    IF(BASH_COMPLETION_FOUND)
+        INSTALL(FILES g3kb-switch-completion.bash
+                DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}
+                RENAME g3kb-switch)
+    ENDIF()
+ENDIF()
 
 INSTALL(TARGETS ${name} ${g3kblib}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib OPTIONAL
-)
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib OPTIONAL)
 

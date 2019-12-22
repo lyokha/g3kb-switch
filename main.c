@@ -19,17 +19,24 @@
 #include "switch.h"
 
 #define VERSION_MAJ 0
-#define VERSION_MIN 2
+#define VERSION_MIN 3
+
+
+void version( void )
+{
+    g_print( "g3kb-switch version %d.%d\n", VERSION_MAJ, VERSION_MIN );
+}
 
 
 void usage( void )
 {
-    g_print( "Usage: g3kb-switch -s ARG    Sets current layout group to ARG\n"
-             "       g3kb-switch -l        Displays all layout groups\n"
-             "       g3kb-switch -h        Displays this message\n"
-             "       g3kb-switch -v        Shows version number\n"
+    version();
+    g_print( "Usage: g3kb-switch [-p]      Show current layout group\n"
+             "       g3kb-switch -l        Show all layout groups\n"
              "       g3kb-switch -n        Switch to the next layout group\n"
-             "       g3kb-switch [-p]      Displays current layout group\n" );
+             "       g3kb-switch -s ARG    Set current layout group to ARG\n"
+             "       g3kb-switch -h        Show this message and exit\n"
+             "       g3kb-switch -v        Show program version and exit\n" );
 }
 
 
@@ -53,7 +60,7 @@ int main( int argc, char **argv )
         } else if ( g_strcmp0( argv[ 1 ], "-v" ) == 0 ||
                     g_strcmp0( argv[ 1 ], "--version" ) == 0 )
         {
-            g_print( "g3kb-switch version %d.%d\n", VERSION_MAJ, VERSION_MIN );
+            version();
             return 0;
         } else if ( g_strcmp0( argv[ 1 ], "-l" ) == 0 ) {
             print_layouts = TRUE;

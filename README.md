@@ -42,12 +42,12 @@ Usage
 -----
 
 ```ShellSession
-Usage: g3kb-switch -s ARG    Sets current layout group to ARG
-       g3kb-switch -l        Displays all layout groups
-       g3kb-switch -h        Displays this message
-       g3kb-switch -v        Shows version number
+Usage: g3kb-switch [-p]      Show current layout group
+       g3kb-switch -l        Show all layout groups
        g3kb-switch -n        Switch to the next layout group
-       g3kb-switch [-p]      Displays current layout group
+       g3kb-switch -s ARG    Set current layout group to ARG
+       g3kb-switch -h        Show this message and exit
+       g3kb-switch -v        Show program version and exit
 ```
 
 Integration with vim-xkbswitch
