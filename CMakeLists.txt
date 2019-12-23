@@ -25,7 +25,7 @@ IF(G3KBSWITCH_INSTALL_BASH_COMPLETION)
     IF(BASH_COMPLETION_FOUND)
         INSTALL(FILES g3kb-switch-completion.bash
                 DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}
-                RENAME g3kb-switch)
+                RENAME ${name})
     ENDIF()
 ENDIF()
 

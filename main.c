@@ -36,7 +36,8 @@ void usage( void )
              "       g3kb-switch -n        Switch to the next layout group\n"
              "       g3kb-switch -s ARG    Switch to layout group ARG\n"
              "       g3kb-switch -h        Show this message and exit\n"
-             "       g3kb-switch -v        Show program version and exit\n" );
+             "       g3kb-switch -v        Show the program version and exit\n"
+           );
 }
 
 

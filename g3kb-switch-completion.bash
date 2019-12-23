@@ -6,7 +6,7 @@ _g3kb_switch_completion()
         return
     fi
 
-    local comp_opt="-h -l -n -p -s"
+    local comp_opt="-h -p -l -n -s"
 
     if [ "${#COMP_WORDS[@]}" -eq 3 ] ; then
         if [ "${COMP_WORDS[1]}" = "-s" ] ; then
@@ -17,5 +17,5 @@ _g3kb_switch_completion()
     fi
 }
 
-complete -F _g3kb_switch_completion g3kb-switch
+complete -F _g3kb_switch_completion g3kb-switch -o nosort
 
