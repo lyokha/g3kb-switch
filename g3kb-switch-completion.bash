@@ -12,8 +12,8 @@ _g3kb_switch_completion()
         if [ "${COMP_WORDS[1]}" = "-s" ] ; then
             local IFS=$'\n'
             COMPREPLY=( $(printf "%q\n" \
-                $(compgen -W "$(g3kb-switch -l)" \
-                    -- "$(printf "%q\n" "${COMP_WORDS[2]}")")) )
+                            $(compgen -W "$(g3kb-switch -l)" \
+                                -- "$(printf "%q\n" "${COMP_WORDS[2]}")")) )
         fi
     else
         local IFS=$' \t\n'
