@@ -23,7 +23,7 @@
 #define G3KB_SWITCH_VERSION_PATCH 1
 
 
-void version( void )
+static void version( void )
 {
     g_print( "g3kb-switch version %u.%u",
              G3KB_SWITCH_VERSION_MAJOR, G3KB_SWITCH_VERSION_MINOR );
@@ -35,7 +35,7 @@ void version( void )
 }
 
 
-void usage( void )
+static void usage( void )
 {
     version();
     g_print( "Usage: g3kb-switch [-p]      Show the current layout group\n"
