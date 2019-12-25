@@ -18,13 +18,20 @@
 
 #include "switch.h"
 
-#define VERSION_MAJ 0
-#define VERSION_MIN 3
+#define G3KB_SWITCH_VERSION_MAJOR 0
+#define G3KB_SWITCH_VERSION_MINOR 3
+#define G3KB_SWITCH_VERSION_PATCH 1
 
 
 void version( void )
 {
-    g_print( "g3kb-switch version %d.%d\n", VERSION_MAJ, VERSION_MIN );
+    g_print( "g3kb-switch version %u.%u",
+             G3KB_SWITCH_VERSION_MAJOR, G3KB_SWITCH_VERSION_MINOR );
+#if ( G3KB_SWITCH_VERSION_PATCH + 0 )
+    g_print( ".%u\n", G3KB_SWITCH_VERSION_PATCH );
+#else
+    g_print( "\n" );
+#endif
 }
 
 
