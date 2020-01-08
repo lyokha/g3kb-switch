@@ -18,6 +18,7 @@
 
 #include <gio/gio.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include "switch.h"
 
