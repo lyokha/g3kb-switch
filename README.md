@@ -22,7 +22,7 @@ $ sudo apt-get install libglib2.0-dev
 # dnf install glib2-devel
 ```
 
-*In Gentoo*
+*In Gentoo.*
 
 ```ShellSession
 $ sudo emerge -av dev-libs/glib
