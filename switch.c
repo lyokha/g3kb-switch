@@ -125,12 +125,14 @@ gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
 }
 
 
-static gboolean run_method( const gchar *method, gchar **value, GError **err )
+static gboolean run_method( const gchar *name, const gchar *method,
+                            gchar **value, GError **err )
 {
     GDBusConnection *c = NULL;
     GVariant *result = NULL;
     GVariant *vmethod = NULL;
     GVariant *param = NULL;
+    const GVariantType *vtype = NULL;
     GVariantBuilder builder;
     gboolean success;
 
@@ -139,31 +141,42 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
         return FALSE;
     }
 
-    g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
+    if ( method != NULL ) {
+        g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
 
-    vmethod = g_variant_parse( NULL, method, NULL, NULL, NULL );
-    if ( vmethod == NULL ) {
-        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
-                     "Failed to parse input method" );
-        g_object_unref( c );
-        return FALSE;
-    }
+        if ( g_strcmp0( name, "Set" ) == 0 ) {
+            vtype = G_VARIANT_TYPE( "u" );
+        }
 
-    g_variant_builder_add_value( &builder, vmethod );
+        vmethod = g_variant_parse( vtype, method, NULL, NULL, NULL );
+        if ( vmethod == NULL ) {
+            g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                         "Failed to parse input method" );
+            g_object_unref( c );
+            return FALSE;
+        }
 
-    param = g_variant_builder_end( &builder );
-    if ( param == NULL ) {
-        g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
-                     "Failed to build call parameter" );
-        g_object_unref( c );
-        return FALSE;
+        g_variant_builder_add_value( &builder, vmethod );
+
+        param = g_variant_builder_end( &builder );
+        if ( param == NULL ) {
+            g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
+                         "Failed to build call parameter" );
+            g_object_unref( c );
+            return FALSE;
+        }
     }
 
     result = g_dbus_connection_call_sync( c,
                                           "org.gnome.Shell",
+#ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
+                                          "/org/g3kbswitch/G3kbSwitch",
+                                          "org.g3kbswitch.G3kbSwitch",
+#else
                                           "/org/gnome/Shell",
                                           "org.gnome.Shell",
-                                          "Eval",
+#endif
+                                          name,
                                           param,
                                           NULL,
                                           G_DBUS_CALL_FLAGS_NONE,
@@ -172,8 +185,10 @@ static gboolean run_method( const gchar *method, gchar **value, GError **err )
                                           err
                                         );
 
-    g_variant_unref( vmethod );
-    g_object_unref( c );
+    if ( method != NULL ) {
+        g_variant_unref( vmethod );
+        g_object_unref( c );
+    }
 
     if ( result == NULL ) {
         return FALSE;
@@ -209,11 +224,16 @@ GTree *g3kb_build_layouts_map( GError **err )
     GVariant *vdict = NULL;
     GVariantIter iter1, *iter2;
     GTree *layouts = NULL;
+    const gchar *name = NULL;
     const gchar *method = NULL;
     gchar *key, *value;
     gpointer k, v;
     gchar *dict = NULL;
 
+#ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
+    name = "List";
+#else
+    name = "Eval";
     /* BEWARE: g3kb_get_layout() takes currentSource.index while here we simply
      * put counter i as the value of the key when iterating inputSources, this
      * should be correct as soon as currentSource.index drives iteration
@@ -226,8 +246,9 @@ GTree *g3kb_build_layouts_map( GError **err )
                      "imports.ui.status.keyboard.getInputSourceManager()"
                          ".inputSources[i].id})};"
              "ids\"";
+#endif
 
-    if ( ! run_method( method, &dict, err ) ) {
+    if ( ! run_method( name, method, &dict, err ) ) {
         return NULL;
     }
 
@@ -296,14 +317,20 @@ GTree *g3kb_build_layouts_map( GError **err )
 
 guint g3kb_get_layout( GError **err )
 {
+    const gchar *name = NULL;
     const gchar *method = NULL;
     gchar *value = NULL;
     guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
 
+#ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
+    name = "Get";
+#else
+    name = "Eval";
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
+#endif
 
-    if ( ! run_method( method, &value, err ) ) {
+    if ( ! run_method( name, method, &value, err ) ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
@@ -330,6 +357,11 @@ guint g3kb_get_layout( GError **err )
 
 gboolean g3kb_set_layout( guint idx, GError **err )
 {
+#ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
+    static const gsize method_activate_len =
+        /* zero terminator */ /* max 3 digits for index */
+           1 +                   3;
+#else
     static const gchar *method_activate_head =
         "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
     static const gchar *method_activate_tail =
@@ -337,7 +369,9 @@ gboolean g3kb_set_layout( guint idx, GError **err )
     static const gsize method_activate_len =
         /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
            65 +       13 +       1 +                   3;
+#endif
 
+    const gchar *name = NULL;
     gchar method[ method_activate_len ];
 
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
@@ -346,10 +380,16 @@ gboolean g3kb_set_layout( guint idx, GError **err )
         return FALSE;
     }
 
+#ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
+    name = "Set";
+    g_snprintf( method, method_activate_len, "%u", idx );
+#else
+    name = "Eval";
     g_snprintf( method, method_activate_len, "%s%u%s",
                 method_activate_head, idx, method_activate_tail );
+#endif
 
-    return run_method( method, NULL, err );
+    return run_method( name, method, NULL, err );
 }
 
 
