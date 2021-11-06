@@ -126,13 +126,13 @@ gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
 
 
 static gboolean run_method( const gchar *name, const gchar *method,
-                            gchar **value, GError **err )
+                            const GVariantType *vtype, gchar **value,
+                            GError **err )
 {
     GDBusConnection *c = NULL;
     GVariant *result = NULL;
     GVariant *vmethod = NULL;
     GVariant *param = NULL;
-    const GVariantType *vtype = NULL;
     GVariantBuilder builder;
     gboolean success;
 
@@ -143,10 +143,6 @@ static gboolean run_method( const gchar *name, const gchar *method,
 
     if ( method != NULL ) {
         g_variant_builder_init( &builder, G_VARIANT_TYPE_TUPLE );
-
-        if ( g_strcmp0( name, "Set" ) == 0 ) {
-            vtype = G_VARIANT_TYPE( "u" );
-        }
 
         vmethod = g_variant_parse( vtype, method, NULL, NULL, NULL );
         if ( vmethod == NULL ) {
@@ -248,7 +244,7 @@ GTree *g3kb_build_layouts_map( GError **err )
              "ids\"";
 #endif
 
-    if ( ! run_method( name, method, &dict, err ) ) {
+    if ( ! run_method( name, method, NULL, &dict, err ) ) {
         return NULL;
     }
 
@@ -330,7 +326,7 @@ guint g3kb_get_layout( GError **err )
              ".currentSource.index\"";
 #endif
 
-    if ( ! run_method( name, method, &value, err ) ) {
+    if ( ! run_method( name, method, NULL, &value, err ) ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
@@ -372,6 +368,7 @@ gboolean g3kb_set_layout( guint idx, GError **err )
 #endif
 
     const gchar *name = NULL;
+    const GVariantType *vtype = NULL;
     gchar method[ method_activate_len ];
 
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
@@ -382,6 +379,7 @@ gboolean g3kb_set_layout( guint idx, GError **err )
 
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
     name = "Set";
+    vtype = G_VARIANT_TYPE( "u" );
     g_snprintf( method, method_activate_len, "%u", idx );
 #else
     name = "Eval";
@@ -389,7 +387,7 @@ gboolean g3kb_set_layout( guint idx, GError **err )
                 method_activate_head, idx, method_activate_tail );
 #endif
 
-    return run_method( name, method, NULL, err );
+    return run_method( name, method, vtype, NULL, err );
 }
 
 
