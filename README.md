@@ -1,8 +1,9 @@
 g3kb-switch
 ===========
 
-This is a keyboard layout switcher for Gnome 3. It is not based on the X
-interface but rather implements direct D-Bus messaging with the Gnome Shell.
+This is a CLI keyboard layout switcher for *Gnome 3* and *4x*. It is not based
+on the X interface but rather implements direct D-Bus messaging with the Gnome
+Shell.
 
 Installation
 ------------
