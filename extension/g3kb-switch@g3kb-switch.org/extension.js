@@ -42,6 +42,11 @@ class Extension {
         let ids = [];
 
         try {
+            /* BEWARE: Get() takes currentSource.index while here we simply put
+             * counter i as the value of the key when iterating inputSources,
+             * this should be correct as soon as currentSource.index drives
+             * iteration order; to ensure correctness we could also put
+             * inputSources[i].index instead of i */
             for (let i in Keyboard.getInputSourceManager().inputSources) {
                 ids.push({ key: i
                          , value: Keyboard.getInputSourceManager()

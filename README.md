@@ -42,8 +42,8 @@ $ sudo make install
 
 In *Gnome 41* the switcher will only work with *G3kbSwitch Gnome Shell
 extension* because method *org.gnome.Shell.Eval* that was used in the original
-implementation of the switcher was disabled for security reasons. In this case,
-an additional option must be passed to *cmake*.
+implementation of the switcher is now disabled for security reasons. In this
+case, an additional option must be passed to *cmake*.
 
 ```ShellSession
 $ cmake -DCMAKE_BUILD_TYPE=Release -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=ON ..
