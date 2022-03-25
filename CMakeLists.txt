@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET(name g3kb-switch)
 PROJECT(${name})
@@ -36,7 +36,7 @@ ENDIF()
 
 OPTION(G3KBSWITCH_INSTALL_ZSH_COMPLETION "Install zsh completion script" ON)
 IF(G3KBSWITCH_INSTALL_ZSH_COMPLETION)
-    set (ZSH_COMPLETION_COMPLETIONSDIR "/usr/share/zsh/site-functions")
+    SET(ZSH_COMPLETION_COMPLETIONSDIR "/usr/share/zsh/site-functions")
     INSTALL(FILES g3kb-switch-completion.zsh
             DESTINATION ${ZSH_COMPLETION_COMPLETIONSDIR}
             RENAME _${name})
