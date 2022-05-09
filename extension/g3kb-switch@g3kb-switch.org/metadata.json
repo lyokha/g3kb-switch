@@ -4,7 +4,8 @@
     "uuid": "g3kb-switch@g3kb-switch.org",
     "shell-version": [
         "40",
-        "41"
+        "41",
+        "42",
     ],
     "url": "https://github.com/lyokha/g3kb-switch",
     "version" : 1
