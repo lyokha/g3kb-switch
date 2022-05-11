@@ -19,8 +19,8 @@
 #include "switch.h"
 
 #define G3KB_SWITCH_VERSION_MAJOR 1
-#define G3KB_SWITCH_VERSION_MINOR 0
-#define G3KB_SWITCH_VERSION_PATCH 1
+#define G3KB_SWITCH_VERSION_MINOR 1
+#define G3KB_SWITCH_VERSION_PATCH 0
 
 
 static void version( void )
