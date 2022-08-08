@@ -53,7 +53,7 @@ Also, the extension must be installed.
 
 ```ShellSession
 $ cd ../extension
-$ make install  # no sudo requred!
+$ make install  # no sudo required!
 ```
 
 It is wise to make sure that the extension works correctly. In *Fedora 34* and
