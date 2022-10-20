@@ -8,6 +8,8 @@ Shell.
 Installation
 ------------
 
+### Prerequisites
+
 Build requires *glib-2.0*, so you need to install the corresponding development
 package.
 
@@ -31,33 +33,31 @@ $ sudo emerge -av dev-libs/glib
 
 Commands may differ in other Linux distributions.
 
-Now build the program.
+### Gnome 41 and newer
+
+Build and install the switcher.
 
 ```ShellSession
 $ mkdir build && cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release ..
+$ cmake ..
 $ make
 $ sudo make install
 ```
 
-In *Gnome 41* the switcher will only work with *G3kbSwitch Gnome Shell
-extension* because method *org.gnome.Shell.Eval* that was used in the original
-implementation of the switcher is now disabled for security reasons. In this
-case, an additional option must be passed to *cmake*.
+In *Gnome 41*, the switcher will only work with *G3kbSwitch Gnome Shell
+extension*, because method *org.gnome.Shell.Eval* which was used in the original
+implementation of the switcher is now disabled for security reasons.
 
-```ShellSession
-$ cmake -DCMAKE_BUILD_TYPE=Release -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=ON ..
-```
-
-Also, the extension must be installed.
+Build and install the extension.
 
 ```ShellSession
 $ cd ../extension
 $ make install  # no sudo required!
 ```
 
-It is wise to make sure that the extension works correctly. In *Fedora 34* and
-*35* it must be enabled from *gnome-extensions-app*.
+It is wise to make sure that the extension is enabled and works correctly. To
+enable the extension, use program *gnome-extensions-app* or command-line program
+*gnome-extensions*.
 
 A small smoke-test of the extension.
 
@@ -68,6 +68,21 @@ $ gdbus call --session --dest org.gnome.Shell --object-path /org/g3kbswitch/G3kb
 (true, '1')
 $ gdbus call --session --dest org.gnome.Shell --object-path /org/g3kbswitch/G3kbSwitch --method org.g3kbswitch.G3kbSwitch.Set 1
 (true, '')
+```
+
+### Older versions of Gnome
+
+Older versions of Gnome Shell expose method *org.gnome.Shell.Eval* which means
+that the switcher can be built to work with this method rather than using the
+extension. In this case, the cmake configuration step requires one extra option.
+
+Build and install the switcher.
+
+```ShellSession
+$ mkdir build && cd build
+$ cmake ..
+$ make -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=OFF ..
+$ sudo make install
 ```
 
 Usage
