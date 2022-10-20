@@ -44,9 +44,9 @@ $ make
 $ sudo make install
 ```
 
-In *Gnome 41*, the switcher will only work with *G3kbSwitch Gnome Shell
-extension*, because method *org.gnome.Shell.Eval* which was used in the original
-implementation of the switcher is now disabled for security reasons.
+In *Gnome 41* and newer, the switcher will only work with *G3kbSwitch Gnome
+Shell extension*, because method *org.gnome.Shell.Eval* which was used in the
+original implementation of the switcher is now disabled for security reasons.
 
 Build and install the extension.
 
@@ -70,7 +70,7 @@ $ gdbus call --session --dest org.gnome.Shell --object-path /org/g3kbswitch/G3kb
 (true, '')
 ```
 
-### Older versions of Gnome
+### Older versions of Gnome (3.x and 40)
 
 Older versions of Gnome Shell expose method *org.gnome.Shell.Eval* which means
 that the switcher can be built to work with this method rather than using the
