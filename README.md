@@ -80,8 +80,8 @@ Build and install the switcher.
 
 ```ShellSession
 $ mkdir build && cd build
-$ cmake ..
-$ make -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=OFF ..
+$ cmake -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=OFF ..
+$ make
 $ sudo make install
 ```
 
