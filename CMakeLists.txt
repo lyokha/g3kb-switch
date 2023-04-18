@@ -1,7 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET(name g3kb-switch)
-PROJECT(${name})
+PROJECT(${name}
+        LANGUAGES C)
 include(GNUInstallDirs)
 
 FIND_PACKAGE(PkgConfig REQUIRED)
