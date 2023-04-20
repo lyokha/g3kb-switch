@@ -109,8 +109,12 @@ Basically, put in *.vimrc* lines
 
 ```vim
 let g:XkbSwitchEnabled = 1
-let g:XkbSwitchLib = '/usr/local/lib/libg3kbswitch.so'
+let g:XkbSwitchLib = '/usr/local/lib64/libg3kbswitch.so'
 ```
+
+Variable *g:XkbSwitchLib* must contain the actual path to the installed library.
+Setting this variable is optional because vim-xkbswitch tries its best to
+autodetect the path.
 
 See details about configuration rules for vim-xkbswitch
 [here](https://github.com/lyokha/vim-xkbswitch#basic-configuration).
