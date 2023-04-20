@@ -53,9 +53,22 @@ INSTALL(TARGETS ${name} ${g3kblib}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH} OPTIONAL)
 
-OPTION(G3KBSWITCH_INSTALL_MAN_DOCUMENTATION "Install man documentation" OFF)
-IF(G3KBSWITCH_INSTALL_MAN_DOCUMENTATION)
-    INSTALL(FILES docs/${name}.1
+OPTION(G3KBSWITCH_INSTALL_MAN_PAGE "Install man documentation" OFF)
+IF(G3KBSWITCH_INSTALL_MAN_PAGE)
+    SET(man_page ${name}.1)
+    FIND_PROGRAM(GZIP gzip)
+    IF (GZIP)
+        SET(man_gz ${CMAKE_BINARY_DIR}/${man_page}.gz)
+        ADD_CUSTOM_TARGET(man-${name} ALL DEPENDS ${man_gz})
+        ADD_CUSTOM_COMMAND(
+            OUTPUT ${man_gz}
+            COMMAND ${GZIP} -9 --no-name --to-stdout "${man_page}" >"${man_gz}"
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs)
+        SET(man_page ${man_gz})
+    ELSE()
+        SET(man_page ${CMAKE_SOURCE_DIR}/docs/${man_page})
+    ENDIF()
+    INSTALL(FILES ${man_page}
             DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
             COMPONENT documentation)
 ENDIF()

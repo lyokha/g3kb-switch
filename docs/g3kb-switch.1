@@ -14,12 +14,11 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "g3kb-switch" "1" "19 April 2023" "g3kb-switch 1.1" "User Manual"
+.TH "G3KB-SWITCH" "1" "20 April 2023" "g3kb-switch 1.1" "User Manual"
 .hy
 .SH NAME
 .PP
-\f[B]g3kb-switch\f[R] - a CLI keyboard layout switcher for Gnome 3 and
-4x.
+\f[B]g3kb-switch\f[R] - CLI keyboard layout switcher for Gnome 3 and 4x.
 .SH SYNOPSIS
 .PP
 \f[B]g3kb-switch\f[R] [\f[V]-p\f[R] | \f[V]-l\f[R] | \f[V]-n\f[R] |
@@ -31,10 +30,10 @@
 .SH DESCRIPTION
 .PP
 \f[B]g3kb-switch\f[R] implements direct D-Bus messaging with Gnome Shell
-to show, get, and set system keyboard layouts.
-In Gnome 41 and newer, the switcher requires assistance of Gnome
-extension \f[I]g3kb-switch\f[R] that ships with the switcher.
-See details in https://github.com/lyokha/g3kb-switch#g3kb-switch.
+to list, get, and set system keyboard layouts.
+In Gnome 41 and newer, the switcher requires assistance from Gnome
+extension \f[I]g3kb-switch\f[R].
+See details at <https://github.com/lyokha/g3kb-switch#g3kb-switch>.
 .SH OPTIONS
 .TP
 \f[V]-p\f[R]
@@ -54,3 +53,15 @@ show the usage
 .TP
 \f[V]-v\f[R]
 show the version
+.SH SHARED LIBRARY
+.PP
+Shared library \f[B]libg3kbswitch.so\f[R] can manage automatic switching
+of keyboard layouts in Vim and Neovim when entering and leaving Insert
+mode via Vim plugin \f[I]vim-xkbswitch\f[R].
+Details are documented at <https://github.com/lyokha/vim-xkbswitch>.
+.SH AUTHOR
+.PP
+Written by Alexey Radkov.
+.SH REPORTING BUGS
+.PP
+Report bugs to <https://github.com/lyokha/g3kb-switch/issues>.
