@@ -85,11 +85,6 @@ $ make
 $ sudo make install
 ```
 
-### Man documentation
-
-Use cmake flag `-DG3KBSWITCH_INSTALL_MAN_PAGE=ON` to install the man page for
-*g3kb-switch(1)*.
-
 Usage
 -----
 
