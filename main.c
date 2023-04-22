@@ -5,7 +5,7 @@
  *
  *    Description:  g3kb-switch program
  *
- *        Version:  1.0
+ *        Version:  1.2
  *        Created:  10.12.2019 14:59:38
  *       Revision:  none
  *       Compiler:  gcc
@@ -19,7 +19,7 @@
 #include "switch.h"
 
 #define G3KB_SWITCH_VERSION_MAJOR 1
-#define G3KB_SWITCH_VERSION_MINOR 1
+#define G3KB_SWITCH_VERSION_MINOR 2
 #define G3KB_SWITCH_VERSION_PATCH 0
 
 
