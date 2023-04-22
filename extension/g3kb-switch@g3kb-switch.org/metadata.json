@@ -10,6 +10,10 @@
         "44"
     ],
     "url": "https://github.com/lyokha/g3kb-switch",
-    "version" : 1
+    "version" : 1,
+    "session-modes" : [
+        "user",
+        "unlock-dialog"
+  ]
 }
 
