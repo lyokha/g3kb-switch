@@ -59,6 +59,18 @@ It is wise to make sure that the extension is enabled and works correctly. To
 enable the extension, use program *gnome-extensions-app* or command-line program
 *gnome-extensions*.
 
+```ShellSession
+$ gnome-extensions enable g3kb-switch@g3kb-switch.org
+$ gnome-extensions info g3kb-switch@g3kb-switch.org
+g3kb-switch@g3kb-switch.org
+  Name: G3kbSwitch
+  Description: G3kbSwitch helper
+  Path: /home/lyokha/.local/share/gnome-shell/extensions/g3kb-switch@g3kb-switch.org
+  URL: https://github.com/lyokha/g3kb-switch
+  Version: 1
+  State: ENABLED
+```
+
 A small smoke-test of the extension.
 
 ```ShellSession
@@ -108,8 +120,15 @@ let g:XkbSwitchLib = '/usr/local/lib64/libg3kbswitch.so'
 ```
 
 Variable *g:XkbSwitchLib* must contain the actual path to the installed library.
-Setting this variable is optional because vim-xkbswitch tries its best to
-autodetect the path.
+The path can be found with *pkg-config*.
+
+```ShellSession
+$ pkg-config g3kb-switch --variable libpath
+/usr/local/lib64/libg3kbswitch.so
+```
+
+Notice that setting this variable is optional because vim-xkbswitch tries its
+best to autodetect the path. 
 
 See details about configuration rules for vim-xkbswitch
 [here](https://github.com/lyokha/vim-xkbswitch#basic-configuration).

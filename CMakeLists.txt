@@ -1,8 +1,12 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 SET(name g3kb-switch)
 PROJECT(${name}
-        LANGUAGES C)
+        LANGUAGES C
+        HOMEPAGE_URL https://github.com/lyokha/g3kb-switch
+        DESCRIPTION "CLI keyboard layout switcher for Gnome 3 and 4x"
+        VERSION 1.2)
+
 INCLUDE(GNUInstallDirs)
 
 FIND_PACKAGE(PkgConfig REQUIRED)
@@ -52,6 +56,32 @@ ENDIF()
 INSTALL(TARGETS ${name} ${g3kblib}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH} OPTIONAL)
+
+OPTION(G3KBSWITCH_INSTALL_PC_FILE "Install pkg-config file" ON)
+IF(G3KBSWITCH_INSTALL_PC_FILE)
+    SET(G3KBSWITCH_PC_LIBPATH_DECL "libpath=")
+    IF(G3KBSWITCH_BUILD_VIM_XKBSWITCH_LIB)
+        STRING(APPEND
+               G3KBSWITCH_PC_LIBPATH_DECL
+               "\${prefix}/"
+               ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH}
+               "/$<TARGET_FILE_NAME:g3kbswitch>")
+    ENDIF()
+    SET(G3KBSWITCH_PC_EXTNAME_DECL "extname=")
+    IF(G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION)
+        STRING(APPEND
+               G3KBSWITCH_PC_EXTNAME_DECL
+               "g3kb-switch@g3kb-switch.org")
+    ENDIF()
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/${name}.pc.in
+                   ${CMAKE_BINARY_DIR}/${name}.pc.in
+                   @ONLY)
+    FILE(GENERATE
+         OUTPUT ${CMAKE_BINARY_DIR}/${name}.pc
+         INPUT ${CMAKE_BINARY_DIR}/${name}.pc.in)
+    INSTALL(FILES ${CMAKE_BINARY_DIR}/${name}.pc
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+ENDIF()
 
 OPTION(G3KBSWITCH_INSTALL_MAN_PAGE "Install man documentation" ON)
 IF(G3KBSWITCH_INSTALL_MAN_PAGE)
