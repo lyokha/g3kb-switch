@@ -55,6 +55,8 @@ $ cd ../extension
 $ make install  # no sudo required!
 ```
 
+Restart your PC for changes to take effect.
+
 It is wise to make sure that the extension is enabled and works correctly. To
 enable the extension, use program *gnome-extensions-app* or command-line program
 *gnome-extensions*.
