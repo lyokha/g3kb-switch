@@ -74,11 +74,11 @@ IF(G3KBSWITCH_INSTALL_PC_FILE)
                "g3kb-switch@g3kb-switch.org")
     ENDIF()
     CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/${name}.pc.in
-                   ${CMAKE_BINARY_DIR}/${name}.pc.in
+                   ${CMAKE_BINARY_DIR}/${name}.pc.1.in
                    @ONLY)
     FILE(GENERATE
          OUTPUT ${CMAKE_BINARY_DIR}/${name}.pc
-         INPUT ${CMAKE_BINARY_DIR}/${name}.pc.in)
+         INPUT ${CMAKE_BINARY_DIR}/${name}.pc.1.in)
     INSTALL(FILES ${CMAKE_BINARY_DIR}/${name}.pc
             DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 ENDIF()
