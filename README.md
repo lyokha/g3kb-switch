@@ -38,24 +38,16 @@ Commands may differ in other Linux distributions.
 Build and install the switcher.
 
 ```ShellSession
-$ mkdir build && cd build
-$ cmake ..
-$ make
-$ sudo make install
+$ cmake -Bbuild
+$ cmake --build build
+$ sudo cmake --install build
 ```
 
 In *Gnome 41* and newer, the switcher will only work with *G3kbSwitch Gnome
 Shell extension*, because method *org.gnome.Shell.Eval* which was used in the
 original implementation of the switcher is now disabled for security reasons.
 
-Build and install the extension.
-
-```ShellSession
-$ cd ../extension
-$ make install  # no sudo required!
-```
-
-Restart Gnome Shell for changes to take effect.
+After installing the extension, Restart Gnome Shell for changes to take effect.
 
 It is wise to make sure that the extension is enabled and works correctly. To
 enable the extension, use program *gnome-extensions-app* or command-line program
