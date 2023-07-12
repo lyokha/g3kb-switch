@@ -14,7 +14,6 @@
             nativeBuildInputs = [
               cmake
               pkg-config
-              bash-completion
             ];
             buildInputs = [
               glib
