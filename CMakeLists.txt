@@ -14,8 +14,11 @@ PKG_SEARCH_MODULE(GIO REQUIRED gio-2.0)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(BASH_COMPLETION_COMPLETIONSDIR "" CACHE STRING "the directory of bash completions, empty will use the default value coming from pkg-config")
-set(ZSH_COMPLETION_COMPLETIONSDIR "" CACHE STRING "the directory of zsh completions, empty will use the default value")
+SET(BASH_COMPLETION_COMPLETIONSDIR "" CACHE STRING
+    "The directory of bash completions, \
+    empty will use the default value coming from pkg-config")
+SET(ZSH_COMPLETION_COMPLETIONSDIR "" CACHE STRING
+    "The directory of zsh completions, empty will use the default value")
 
 OPTION(G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION "Use Gnome Shell extension" ON)
 IF(G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION)
@@ -58,7 +61,8 @@ IF(G3KBSWITCH_INSTALL_ZSH_COMPLETION)
             RENAME _${name})
 ENDIF()
 
-SET(G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH ${CMAKE_INSTALL_LIBDIR} CACHE STRING "xkbswitch library path relative to ${CMAKE_INSTALL_PREFIX}")
+SET(G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH ${CMAKE_INSTALL_LIBDIR} CACHE STRING
+    "Xkbswitch library path relative to ${CMAKE_INSTALL_PREFIX}")
 INSTALL(TARGETS ${name} ${g3kblib}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH} OPTIONAL)
