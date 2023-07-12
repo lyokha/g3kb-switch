@@ -9,7 +9,7 @@
           formatter = nixpkgs-fmt;
           packages.default = stdenv.mkDerivation rec {
             pname = "g3kb-switch";
-            version = "1.2";
+            version = "1.3";
             src = self;
             nativeBuildInputs = [
               cmake

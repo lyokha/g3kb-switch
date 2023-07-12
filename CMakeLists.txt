@@ -5,7 +5,7 @@ PROJECT(${name}
         LANGUAGES C
         HOMEPAGE_URL https://github.com/lyokha/g3kb-switch
         DESCRIPTION "CLI keyboard layout switcher for Gnome 3 and 4x"
-        VERSION 1.2)
+        VERSION 1.3)
 
 INCLUDE(GNUInstallDirs)
 
