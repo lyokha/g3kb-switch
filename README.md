@@ -12,20 +12,26 @@ Installation
 
 You can directly install this program by:
 
-In Archlinux, this program can be got from
+*In Arch Linux*, this program can be got from
 [AUR](https://aur.archlinux.org/packages/g3kb-switch).
 
 ```ShellSession
 $ yay -S g3kb-switch
 ```
 
-In Nix/NixOS, official repository have included it:
+*In Fedora*.
+
+```ShellSession
+$ dnf install g3kb-switch
+```
+
+*In Nix / NixOS*, official repository have included it.
 
 ```ShellSession
 $ nix-env -iA nixos.g3kb-switch
 ```
 
-You can just run this program without installing it to your OS by:
+You can just run this program without installing it to your OS by
 
 ```ShellSession
 $ nix run 'github#lyokha/g3kb-switch' -- --help
@@ -70,7 +76,7 @@ In *Gnome 41* and newer, the switcher will only work with *G3kbSwitch Gnome
 Shell extension*, because method *org.gnome.Shell.Eval* which was used in the
 original implementation of the switcher is now disabled for security reasons.
 
-After installing the extension, Restart Gnome Shell for changes to take effect.
+After installing the extension, restart Gnome Shell for changes to take effect.
 
 It is wise to make sure that the extension is enabled and works correctly. To
 enable the extension, use program *gnome-extensions-app* or command-line program
@@ -82,7 +88,7 @@ $ gnome-extensions info g3kb-switch@g3kb-switch.org
 g3kb-switch@g3kb-switch.org
   Name: G3kbSwitch
   Description: G3kbSwitch helper
-  Path: /home/lyokha/.local/share/gnome-shell/extensions/g3kb-switch@g3kb-switch.org
+  Path: /usr/local/share/gnome-shell/extensions/g3kb-switch@g3kb-switch.org
   URL: https://github.com/lyokha/g3kb-switch
   Version: 1
   State: ENABLED
