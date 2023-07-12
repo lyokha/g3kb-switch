@@ -8,6 +8,29 @@ Shell.
 Installation
 ------------
 
+### Install
+
+You can directly install this program by:
+
+In Archlinux, this program can be got from
+[AUR](https://aur.archlinux.org/packages/g3kb-switch).
+
+```ShellSession
+$ yay -S g3kb-switch
+```
+
+In Nix/NixOS, official repository have included it:
+
+```ShellSession
+$ nix-env -iA nixos.g3kb-switch
+```
+
+You can just run this program without installing it to your OS by:
+
+```ShellSession
+$ nix run 'github#lyokha/g3kb-switch' -- --help
+```
+
 ### Prerequisites
 
 Build requires *glib-2.0*, so you need to install the corresponding development
