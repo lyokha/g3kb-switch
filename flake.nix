@@ -23,9 +23,6 @@
               "-DBASH_COMPLETION_COMPLETIONSDIR=${placeholder "out"}/share/bash-completions/completions"
               "-DZSH_COMPLETION_COMPLETIONSDIR=${placeholder "out"}/share/zsh/site-functions"
             ];
-            meta = {
-              mainProgram = "g3kb-switch";
-            };
           };
         }
       );

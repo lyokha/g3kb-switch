@@ -105,6 +105,18 @@ $ gdbus call --session --dest org.gnome.Shell --object-path /org/g3kbswitch/G3kb
 (true, '')
 ```
 
+### Package
+
+After `cmake --build build`, run:
+
+```ShellSession
+$ cd build
+# generate *.deb for debian/ubuntu
+$ cpack -G DEB
+# generate *.rpm for redhat
+$ cpack -G RPM
+```
+
 ### Older versions of Gnome (3.x and 40)
 
 Older versions of Gnome Shell expose method *org.gnome.Shell.Eval* which means
