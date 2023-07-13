@@ -22,7 +22,7 @@ $ yay -S g3kb-switch
 *In Fedora*.
 
 ```ShellSession
-$ dnf install g3kb-switch
+$ sudo dnf install g3kb-switch
 ```
 
 *In Nix / NixOS*, official repository have included it.
