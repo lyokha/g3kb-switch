@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 SET(name g3kb-switch)
 SET(HOMEPAGE_URL https://github.com/lyokha/g3kb-switch)
@@ -46,11 +46,13 @@ IF(G3KBSWITCH_INSTALL_BASH_COMPLETION)
     IF(NOT BASH_COMPLETION_COMPLETIONSDIR)
         FIND_PACKAGE(bash-completion)
     ENDIF()
-    IF(BASH_COMPLETION_COMPLETIONSDIR)
-        INSTALL(FILES g3kb-switch-completion.bash
-                DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}
-                RENAME ${name})
+    IF(NOT BASH_COMPLETION_COMPLETIONSDIR)
+        SET(BASH_COMPLETION_COMPLETIONSDIR
+            "${CMAKE_INSTALL_DATAROOTDIR}/bash-completion/completions")
     ENDIF()
+    INSTALL(FILES g3kb-switch-completion.bash
+            DESTINATION ${BASH_COMPLETION_COMPLETIONSDIR}
+            RENAME ${name})
 ENDIF()
 
 OPTION(G3KBSWITCH_INSTALL_ZSH_COMPLETION "Install zsh completion script" ON)
@@ -72,19 +74,16 @@ INSTALL(TARGETS ${name} ${g3kblib}
 
 OPTION(G3KBSWITCH_INSTALL_PC_FILE "Install pkg-config file" ON)
 IF(G3KBSWITCH_INSTALL_PC_FILE)
-    SET(G3KBSWITCH_PC_LIBPATH_DECL "libpath=")
     IF(G3KBSWITCH_BUILD_VIM_XKBSWITCH_LIB)
-        STRING(APPEND
-               G3KBSWITCH_PC_LIBPATH_DECL
-               "\${prefix}/"
-               ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH}
-               "/$<TARGET_FILE_NAME:g3kbswitch>")
+        CMAKE_PATH(APPEND
+                   G3KBSWITCH_PC_LIBPATH_DECL
+                   "\${prefix}"
+                   ${G3KBSWITCH_VIM_XKBSWITCH_LIB_PATH}
+                   "$<TARGET_FILE_NAME:g3kbswitch>")
+        STRING(PREPEND G3KBSWITCH_PC_LIBPATH_DECL "libpath=")
     ENDIF()
-    SET(G3KBSWITCH_PC_EXTNAME_DECL "extname=")
     IF(G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION)
-        STRING(APPEND
-               G3KBSWITCH_PC_EXTNAME_DECL
-               "g3kb-switch@g3kb-switch.org")
+        SET(G3KBSWITCH_PC_EXTNAME_DECL "extname=g3kb-switch@g3kb-switch.org")
     ENDIF()
     CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/${name}.pc.in
                    ${CMAKE_BINARY_DIR}/${name}.pc.1.in

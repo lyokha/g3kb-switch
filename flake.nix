@@ -18,11 +18,6 @@
             buildInputs = [
               glib
             ];
-            cmakeFlags = [
-              "-DG3KBSWITCH_VIM_XKBSWITCH_LIB_PATH=lib"
-              "-DBASH_COMPLETION_COMPLETIONSDIR=${placeholder "out"}/share/bash-completions/completions"
-              "-DZSH_COMPLETION_COMPLETIONSDIR=${placeholder "out"}/share/zsh/site-functions"
-            ];
           };
         }
       );
