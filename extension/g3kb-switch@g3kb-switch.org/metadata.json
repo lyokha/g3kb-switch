@@ -3,14 +3,9 @@
     "description": "G3kbSwitch helper",
     "uuid": "g3kb-switch@g3kb-switch.org",
     "shell-version": [
-        "40",
-        "41",
-        "42",
-        "43",
-        "44"
+        "45"
     ],
     "url": "https://github.com/lyokha/g3kb-switch",
-    "version" : 1,
     "session-modes" : [
         "user",
         "unlock-dialog"

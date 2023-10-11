@@ -1,7 +1,8 @@
 'use strict';
 
-const Gio = imports.gi.Gio;
-const Keyboard = imports.ui.status.keyboard;
+import Gio from 'gi://Gio';
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Keyboard from 'resource:///org/gnome/shell/ui/status/keyboard.js';
 
 const G3kbSwitchIface = `
 <node>
@@ -22,8 +23,9 @@ const G3kbSwitchIface = `
     </interface>
 </node>`;
 
-class Extension {
-    constructor() {
+export default class G3kbSwitchExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
         this._dbusImpl =
             Gio.DBusExportedObject.wrapJSObject(G3kbSwitchIface, this);
     }
@@ -98,7 +100,4 @@ class Extension {
     }
 }
 
-function init() {
-    return new Extension();
-}
 
