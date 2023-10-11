@@ -62,7 +62,7 @@ $ sudo emerge -av dev-libs/glib
 
 Commands may differ in other Linux distributions.
 
-### Gnome 41 and newer
+### Gnome 45 and newer
 
 Build and install the switcher.
 
@@ -105,6 +105,34 @@ $ gdbus call --session --dest org.gnome.Shell --object-path /org/g3kbswitch/G3kb
 (true, '')
 ```
 
+### Older versions of Gnome (41 through 44)
+
+Older versions of Gnome Shell require a different implementation of the
+extension. In this case, the cmake configuration step requires one extra option.
+
+Build and install the switcher.
+
+```ShellSession
+$ cmake -Bbuild -DG3KBSWITCH_WITH_LEGACY_GNOME_SHELL_EXTENSION=ON
+$ cmake --build build
+$ sudo cmake --install build
+```
+
+### Even older versions of Gnome (3.x and 40)
+
+Even older versions of Gnome Shell expose method *org.gnome.Shell.Eval* which
+means that the switcher can be built to work with this method rather than using
+the extension. In this case, the cmake configuration step requires one extra
+option.
+
+Build and install the switcher.
+
+```ShellSession
+$ cmake -Bbuild -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=OFF
+$ cmake --build build
+$ sudo cmake --install build
+```
+
 ### Package
 
 After `cmake --build build`, run:
@@ -115,21 +143,6 @@ $ cd build
 $ cpack -G DEB
 # generate *.rpm for redhat
 $ cpack -G RPM
-```
-
-### Older versions of Gnome (3.x and 40)
-
-Older versions of Gnome Shell expose method *org.gnome.Shell.Eval* which means
-that the switcher can be built to work with this method rather than using the
-extension. In this case, the cmake configuration step requires one extra option.
-
-Build and install the switcher.
-
-```ShellSession
-$ mkdir build && cd build
-$ cmake -DG3KBSWITCH_WITH_GNOME_SHELL_EXTENSION=OFF ..
-$ make
-$ sudo make install
 ```
 
 Usage
