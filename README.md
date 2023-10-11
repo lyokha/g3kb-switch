@@ -75,6 +75,9 @@ $ sudo cmake --install build
 In *Gnome 41* and newer, the switcher will only work with *G3kbSwitch Gnome
 Shell extension*, because method *org.gnome.Shell.Eval* which was used in the
 original implementation of the switcher is now disabled for security reasons.
+Note that in *Gnome 41* through *44* the extension differs from that which is
+required in *Gnome 45*, see build instructions for older Gnome versions in the
+next section.
 
 After installing the extension, restart Gnome Shell for changes to take effect.
 
