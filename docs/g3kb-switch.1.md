@@ -1,3 +1,11 @@
+---
+title: G3KB-SWITCH
+section: 1
+header: User Manual
+footer: ${PROJECT_NAME} ${PROJECT_VERSION}
+date: ${BUILD_DATE}
+...
+
 # NAME
 **g3kb-switch** - CLI keyboard layout switcher for Gnome 3 and 4x.
 
@@ -39,8 +47,8 @@ layouts in Vim and Neovim when entering and leaving Insert mode via Vim plugin
 *vim-xkbswitch*. Details are documented at
 <https://github.com/lyokha/vim-xkbswitch>.
 
-# AUTHOR
-Written by Alexey Radkov.
+# AUTHORS
+Written by Alexey Radkov and Freed-Wu.
 
 # REPORTING BUGS
 Report bugs to <https://github.com/lyokha/g3kb-switch/issues>.

@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 SET(name g3kb-switch)
 SET(HOMEPAGE_URL https://github.com/lyokha/g3kb-switch)
+STRING(TIMESTAMP BUILD_DATE "%d %B %Y")
 # get version from git tag in github action
 STRING(REGEX MATCH [[[0-9](\.[0-9])*]] VERSION "$ENV{GITHUB_REF_NAME}")
 IF(NOT VERSION)
@@ -26,7 +27,6 @@ FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_SEARCH_MODULE(GIO REQUIRED gio-2.0)
 
 CONFIGURE_FILE(config.h.in config.h)
-CONFIGURE_FILE(docs/metadata.json.in docs/metadata.json)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -126,17 +126,19 @@ ENDIF()
 OPTION(G3KBSWITCH_INSTALL_MAN_PAGE "Install man documentation" ON)
 IF(G3KBSWITCH_INSTALL_MAN_PAGE)
     SET(man_page ${name}.1)
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/docs/${man_page}.in
+                   ${CMAKE_BINARY_DIR}/docs/${man_page})
     FIND_PROGRAM(GZIP gzip)
-    IF (GZIP)
+    IF(GZIP)
         SET(man_gz ${CMAKE_BINARY_DIR}/${man_page}.gz)
         ADD_CUSTOM_TARGET(man-${name} ALL DEPENDS ${man_gz})
         ADD_CUSTOM_COMMAND(
             OUTPUT ${man_gz}
             COMMAND ${GZIP} -9 --no-name --to-stdout "${man_page}" >"${man_gz}"
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs)
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/docs)
         SET(man_page ${man_gz})
     ELSE()
-        SET(man_page ${CMAKE_SOURCE_DIR}/docs/${man_page})
+        SET(man_page ${CMAKE_BINARY_DIR}/docs/${man_page})
     ENDIF()
     INSTALL(FILES ${man_page}
             DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
@@ -151,3 +153,4 @@ SET(CPACK_RPM_PACKAGE_URL ${HOMEPAGE_URL})
 INCLUDE(CPack)
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
