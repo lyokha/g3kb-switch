@@ -1,9 +1,3 @@
----
-title: G3KB-SWITCH
-section: 1
-header: User Manual
----
-
 # NAME
 **g3kb-switch** - CLI keyboard layout switcher for Gnome 3 and 4x.
 

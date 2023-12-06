@@ -6,7 +6,11 @@ SET(HOMEPAGE_URL https://github.com/lyokha/g3kb-switch)
 STRING(REGEX MATCH [[[0-9](\.[0-9])*]] VERSION "$ENV{GITHUB_REF_NAME}")
 IF(NOT VERSION)
     # a fallback
-    SET(VERSION 0.0.0.0)
+    EXECUTE_PROCESS(COMMAND git describe OUTPUT_VARIABLE VERSION)
+    STRING(REGEX MATCH [[[0-9](\.[0-9])*]] VERSION "${VERSION}")
+    IF(NOT VERSION)
+        SET(VERSION 0.0.0.0)
+    ENDIF()
 ENDIF()
 PROJECT(${name}
         LANGUAGES C
@@ -22,6 +26,7 @@ FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_SEARCH_MODULE(GIO REQUIRED gio-2.0)
 
 CONFIGURE_FILE(config.h.in config.h)
+CONFIGURE_FILE(docs/metadata.json.in docs/metadata.json)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
