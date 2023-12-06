@@ -2,11 +2,17 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 SET(name g3kb-switch)
 SET(HOMEPAGE_URL https://github.com/lyokha/g3kb-switch)
+# get version from git tag in github action
+STRING(REGEX MATCH [[[0-9](\.[0-9])*]] VERSION "$ENV{GITHUB_REF_NAME}")
+IF(NOT VERSION)
+    # a fallback
+    SET(VERSION 0.0.0.0)
+ENDIF()
 PROJECT(${name}
         LANGUAGES C
         HOMEPAGE_URL ${HOMEPAGE_URL}
         DESCRIPTION "CLI keyboard layout switcher for Gnome 3 and 4x"
-        VERSION 1.3)
+        VERSION ${VERSION})
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE(GNUInstallDirs)

@@ -1,0 +1,59 @@
+---
+"on":
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+# https://github.com/softprops/action-gh-release/issues/236
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install rpm
+      - name: Build
+        run: |
+          cmake -Bbuild
+          cmake --build build
+          cmake --build build
+          # TODO: disable ctest because we haven't add any test
+          # ctest --test-dir build
+          cd build
+          cpack -G DEB
+          cpack -G RPM
+      # TODO: disable codecov because we disable ctest
+      # - uses: codecov/codecov-action@v3
+      #   with:
+      #     gcov: true
+      - uses: actions/upload-artifact@v3
+        if: "! startsWith(github.ref, 'refs/tags/')"
+        with:
+          path: |
+            build/*.deb
+            build/*.rpm
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/*.deb
+            build/*.rpm
+
+  deploy-aur:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: Freed-Wu/update-aur-package@v1.0.11
+        with:
+          package_name: g3kb-switch
+          ssh_private_key: ${{secrets.AUR_SSH_PRIVATE_KEY}}
