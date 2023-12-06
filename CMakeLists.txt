@@ -7,12 +7,15 @@ PROJECT(${name}
         HOMEPAGE_URL ${HOMEPAGE_URL}
         DESCRIPTION "CLI keyboard layout switcher for Gnome 3 and 4x"
         VERSION 1.3)
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE(GNUInstallDirs)
 INCLUDE(CMakeDependentOption)
 
 FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_SEARCH_MODULE(GIO REQUIRED gio-2.0)
+
+CONFIGURE_FILE(config.h.in config.h)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
