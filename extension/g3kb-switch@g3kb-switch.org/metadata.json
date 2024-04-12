@@ -3,7 +3,8 @@
     "description": "G3kbSwitch helper",
     "uuid": "g3kb-switch@g3kb-switch.org",
     "shell-version": [
-        "45"
+        "45",
+        "46"
     ],
     "url": "https://github.com/lyokha/g3kb-switch",
     "session-modes" : [
