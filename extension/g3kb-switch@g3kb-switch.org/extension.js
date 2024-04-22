@@ -1,3 +1,7 @@
+/// <reference types="@girs/gio-2.0/gio-2.0" />
+/// <reference types="@girs/gnome-shell/dist/extensions" />
+/// <reference types="@girs/gnome-shell/dist/ui/status/keyboard-ambient" />
+
 'use strict';
 
 import Gio from 'gi://Gio';
@@ -99,4 +103,3 @@ export default class G3kbSwitchExtension extends Extension {
         return [success, returnValue];
     }
 }
-
