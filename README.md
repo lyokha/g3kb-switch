@@ -79,6 +79,9 @@ Note that in *Gnome 41* through *44* the extension differs from that which is
 required in *Gnome 45*, see build instructions for older Gnome versions in the
 next section.
 
+You can use [unsafe-mode-menu](https://github.com/linushdot/unsafe-mode-menu) to
+toggle unsafe mode.
+
 After installing the extension, restart Gnome Shell for changes to take effect.
 
 It is wise to make sure that the extension is enabled and works correctly. To
