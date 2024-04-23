@@ -19,6 +19,7 @@ PROJECT(${name}
         DESCRIPTION "CLI keyboard layout switcher for Gnome 3 and 4x"
         VERSION ${VERSION})
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+ADD_DEFINITIONS(-D__OPTIMIZE__)
 
 INCLUDE(GNUInstallDirs)
 INCLUDE(CMakeDependentOption)

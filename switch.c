@@ -25,7 +25,8 @@
 #define G3KB_SWITCH_MAX_LAYOUTS 256
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
 
-#define G3KB_SWITCH_ERROR g3kb_switch_error()
+static G_DEFINE_QUARK(g3kb_switch_error_quark, g3kb_switch_error)
+#define G3KB_SWITCH_ERROR g3kb_switch_error_quark()
 
 #define G3KB_SWITCH_ERROR_RUN_METHOD 1
 #define G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP 2
@@ -46,12 +47,6 @@ struct next_key_search_data
     guintptr next;
     gboolean found;
 };
-
-
-static GQuark g3kb_switch_error( void )
-{
-    return g_quark_from_static_string( "g3kb-switch-error-quark" );
-}
 
 
 /* compare two guintptr values */
