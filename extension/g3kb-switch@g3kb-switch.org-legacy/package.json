@@ -4,6 +4,7 @@
     "tabWidth": 4
   },
   "devDependencies": {
+    "@girs/gio-2.0": "^2.78.0-3.3.0",
     "@girs/gnome-shell": "^46.0.0-beta6",
     "prettier": "^3.2.5"
   }

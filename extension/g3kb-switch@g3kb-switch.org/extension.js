@@ -5,7 +5,7 @@
 'use strict';
 
 import Gio from 'gi://Gio';
-import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Keyboard from 'resource:///org/gnome/shell/ui/status/keyboard.js';
 
 const G3kbSwitchIface = `
@@ -30,8 +30,10 @@ const G3kbSwitchIface = `
 export default class G3kbSwitchExtension extends Extension {
     constructor(metadata) {
         super(metadata);
-        this._dbusImpl =
-            Gio.DBusExportedObject.wrapJSObject(G3kbSwitchIface, this);
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(
+            G3kbSwitchIface,
+            this,
+        );
     }
 
     enable() {
@@ -54,10 +56,10 @@ export default class G3kbSwitchExtension extends Extension {
              * iteration order; to ensure correctness we could also put
              * inputSources[i].index instead of i */
             for (let i in Keyboard.getInputSourceManager().inputSources) {
-                ids.push({ key: i
-                         , value: Keyboard.getInputSourceManager()
-                                  .inputSources[i].id
-                })
+                ids.push({
+                    key: i,
+                    value: Keyboard.getInputSourceManager().inputSources[i].id,
+                });
             }
             returnValue = JSON.stringify(ids);
             returnValue = returnValue == undefined ? '' : returnValue;

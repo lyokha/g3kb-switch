@@ -1,3 +1,6 @@
+/// <reference types="@girs/gio-2.0/gio-2.0" />
+/// <reference types="@girs/gnome-shell/dist/ui/status/keyboard-ambient" />
+
 'use strict';
 
 const Gio = imports.gi.Gio;
@@ -24,8 +27,10 @@ const G3kbSwitchIface = `
 
 class Extension {
     constructor() {
-        this._dbusImpl =
-            Gio.DBusExportedObject.wrapJSObject(G3kbSwitchIface, this);
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(
+            G3kbSwitchIface,
+            this,
+        );
     }
 
     enable() {
@@ -48,10 +53,10 @@ class Extension {
              * iteration order; to ensure correctness we could also put
              * inputSources[i].index instead of i */
             for (let i in Keyboard.getInputSourceManager().inputSources) {
-                ids.push({ key: i
-                         , value: Keyboard.getInputSourceManager()
-                                  .inputSources[i].id
-                })
+                ids.push({
+                    key: i,
+                    value: Keyboard.getInputSourceManager().inputSources[i].id,
+                });
             }
             returnValue = JSON.stringify(ids);
             returnValue = returnValue == undefined ? '' : returnValue;
@@ -101,4 +106,3 @@ class Extension {
 function init() {
     return new Extension();
 }
-
