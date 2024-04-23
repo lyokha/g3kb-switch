@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#shellcheck disable=SC2207
 
 _g3kb_switch_completion()
 {
@@ -23,4 +23,3 @@ _g3kb_switch_completion()
 }
 
 complete -F _g3kb_switch_completion -o nosort g3kb-switch
-

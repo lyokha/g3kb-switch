@@ -52,4 +52,3 @@ Written by Alexey Radkov and Freed-Wu.
 
 # REPORTING BUGS
 Report bugs to <https://github.com/lyokha/g3kb-switch/issues>.
-
