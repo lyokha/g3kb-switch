@@ -28,10 +28,12 @@
 static G_DEFINE_QUARK(g3kb_switch_error_quark, g3kb_switch_error)
 #define G3KB_SWITCH_ERROR g3kb_switch_error_quark()
 
-#define G3KB_SWITCH_ERROR_RUN_METHOD 1
-#define G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP 2
-#define G3KB_SWITCH_ERROR_GET_LAYOUT 3
-#define G3KB_SWITCH_ERROR_SET_LAYOUT 4
+enum g3kb_switch_error_type { 
+    G3KB_SWITCH_ERROR_RUN_METHOD,
+    G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
+    G3KB_SWITCH_ERROR_GET_LAYOUT,
+    G3KB_SWITCH_ERROR_SET_LAYOUT,
+};
 
 
 struct value_search_data
