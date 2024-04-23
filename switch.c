@@ -172,13 +172,16 @@ GTree *g3kb_build_layouts_map( GError **err )
     GVariantIter iter1, *iter2;
     GTree *layouts = NULL;
     const gchar *name = NULL;
-    const gchar *method = NULL;
+    const gchar *method;
+    const GVariantType *vtype;
     gchar *key, *value;
     gpointer k, v;
     gchar *dict = NULL;
 
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
     name = "List";
+    method = NULL;
+    vtype = NULL;
 #else
     name = "Eval";
     /* BEWARE: g3kb_get_layout() takes currentSource.index while here we simply
@@ -193,9 +196,10 @@ GTree *g3kb_build_layouts_map( GError **err )
              "imports.ui.status.keyboard.getInputSourceManager()"
              ".inputSources[i].id})};"
              "ids\"";
+    vtype = G_VARIANT_TYPE( "s" );
 #endif
 
-    if ( !run_method( name, method, NULL, &dict, err ) ) {
+    if ( !run_method( name, method, vtype, &dict, err ) ) {
         return NULL;
     }
 
@@ -264,19 +268,26 @@ GTree *g3kb_build_layouts_map( GError **err )
 guint g3kb_get_layout( GError **err )
 {
     const gchar *name = NULL;
-    const gchar *method = NULL;
+    const gchar *method;
     gchar *value = NULL;
+    const GVariantType *vtype;
     guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
 
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
     name = "Get";
+    vtype = NULL;
+    method = NULL;
 #else
     name = "Eval";
+    vtype = G_VARIANT_TYPE( "s" );
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 #endif
 
-    if ( !run_method( name, method, NULL, &value, err ) ) {
+    if ( !run_method( name, method, vtype, &value, err ) ) {
+        /* BEWARE: return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
+         * the returned value is supposed to be later passed to
+         * g3kb_search_layout(), this should not be a problem */
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
@@ -288,11 +299,7 @@ guint g3kb_get_layout( GError **err )
         g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_GET_LAYOUT,
                      "Key %s is not a valid index",
                      value == NULL ? "<empty>" : value );
-        g_free( value );
-        /* BEWARE: return invalid value G3KB_SWITCH_MAX_LAYOUTS, but as far as
-         * the returned value is supposed to be later passed to
-         * g3kb_search_layout(), this should not be a problem */
-        return G3KB_SWITCH_MAX_LAYOUTS;
+        idx = G3KB_SWITCH_MAX_LAYOUTS;
     }
 
     g_free( value );
@@ -307,16 +314,17 @@ gboolean g3kb_set_layout( guint idx, GError **err )
         /* zero terminator */ /* max 3 digits for index */
         1 + 3;
 #else
-    static const gchar *method_activate_head =
-        "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
-    static const gchar *method_activate_tail = "].activate()\"";
+#define METHOD_ACTIVATE_HEAD                                                   \
+    "\"imports.ui.status.keyboard.getInputSourceManager().inputSources["
+#define METHOD_ACTIVATE_TAIL "].activate()\""
     static const gsize method_activate_len =
         /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
-        65 + 13 + 1 + 3;
+        sizeof( METHOD_ACTIVATE_HEAD ) - 1 + sizeof( METHOD_ACTIVATE_TAIL ) -
+        1 + 1 + 3;
 #endif
 
     const gchar *name = NULL;
-    const GVariantType *vtype = NULL;
+    const GVariantType *vtype;
     gchar method[ method_activate_len ];
 
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
@@ -331,8 +339,9 @@ gboolean g3kb_set_layout( guint idx, GError **err )
     g_snprintf( method, method_activate_len, "%u", idx );
 #else
     name = "Eval";
-    g_snprintf( method, method_activate_len, "%s%u%s", method_activate_head,
-                idx, method_activate_tail );
+    vtype = G_VARIANT_TYPE( "s" );
+    g_snprintf( method, method_activate_len,
+                METHOD_ACTIVATE_HEAD "%u" METHOD_ACTIVATE_TAIL, idx );
 #endif
 
     return run_method( name, method, vtype, NULL, err );
@@ -396,8 +405,7 @@ guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
 
     GTreeNode *node = g_tree_lookup_node( layouts, (gconstpointer)key );
     /* if current layout is last layout, next layout will be not found
-     * just return 0 to use the first layout
-     */
+     * just return 0 to use the first layout */
     if ( node == NULL || ( node = g_tree_node_next( node ) ) == NULL ) {
         return 0;
     }
