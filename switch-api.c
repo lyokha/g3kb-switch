@@ -10,17 +10,15 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Alexey Radkov (), 
- *        Company:  
+ *         Author:  Alexey Radkov (),
+ *        Company:
  *
  * =============================================================================
  */
 
 #include "switch.h"
 
-
 static GTree *layouts = NULL;
-
 
 const char *Xkb_Switch_getXkbLayout( const char *unused )
 {
@@ -38,9 +36,8 @@ const char *Xkb_Switch_getXkbLayout( const char *unused )
         return "";
     }
 
-    return ( const char * ) layout;
+    return (const char *)layout;
 }
-
 
 const char *Xkb_Switch_setXkbLayout( const char *layout )
 {
@@ -51,10 +48,9 @@ const char *Xkb_Switch_setXkbLayout( const char *layout )
         }
     }
 
-    if ( ! g3kb_safe_set_layout( layouts, layout, NULL ) ) {
+    if ( !g3kb_safe_set_layout( layouts, layout, NULL ) ) {
         return "";
     }
 
     return "";
 }
-

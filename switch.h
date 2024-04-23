@@ -10,8 +10,8 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Alexey Radkov (), 
- *        Company:  
+ *         Author:  Alexey Radkov (),
+ *        Company:
  *
  * =============================================================================
  */
@@ -20,7 +20,6 @@
 #define G3KB_SWITCH_H
 
 #include <glib.h>
-
 
 /* layouts map translates indexes (of type guintptr) to layout ids (gchar *) */
 gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer ignored );
@@ -41,5 +40,4 @@ gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
 guintptr g3kb_get_next_layout( GTree *layouts, GError **err );
 gboolean g3kb_set_next_layout( GTree *layouts, GError **err );
 
-#endif  /* G3KB_SWITCH_H */
-
+#endif /* G3KB_SWITCH_H */

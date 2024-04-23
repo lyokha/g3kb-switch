@@ -1,0 +1,8 @@
+---
+IndentWidth: 4
+BreakBeforeBraces: Linux
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: true
+  Other: true
+SpacesInSquareBrackets: true

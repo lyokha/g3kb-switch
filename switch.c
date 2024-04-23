@@ -10,14 +10,14 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Alexey Radkov (), 
- *        Company:  
+ *         Author:  Alexey Radkov (),
+ *        Company:
  *
  * =============================================================================
  */
 
-#include <gio/gio.h>
 #include <errno.h>
+#include <gio/gio.h>
 #include <stdlib.h>
 
 #include "switch.h"
@@ -25,39 +25,34 @@
 #define G3KB_SWITCH_MAX_LAYOUTS 256
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
 
-static G_DEFINE_QUARK(g3kb_switch_error_quark, g3kb_switch_error)
+static G_DEFINE_QUARK( g3kb_switch_error_quark, g3kb_switch_error )
 #define G3KB_SWITCH_ERROR g3kb_switch_error_quark()
 
-enum g3kb_switch_error_type { 
-    G3KB_SWITCH_ERROR_RUN_METHOD,
-    G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
-    G3KB_SWITCH_ERROR_GET_LAYOUT,
-    G3KB_SWITCH_ERROR_SET_LAYOUT,
-};
+    enum g3kb_switch_error_type {
+        G3KB_SWITCH_ERROR_RUN_METHOD,
+        G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
+        G3KB_SWITCH_ERROR_GET_LAYOUT,
+        G3KB_SWITCH_ERROR_SET_LAYOUT,
+    };
 
-
-struct value_search_data
-{
+struct value_search_data {
     const gchar *value;
     guintptr idx;
 };
 
-
-struct next_key_search_data
-{
+struct next_key_search_data {
     guintptr key;
     guintptr next;
     gboolean found;
 };
-
 
 /* compare two guintptr values */
 static gint key_compare( gconstpointer k1, gconstpointer k2, gpointer unused )
 {
     guintptr a, b;
 
-    a = ( guintptr ) k1;
-    b = ( guintptr ) k2;
+    a = (guintptr)k1;
+    b = (guintptr)k2;
 
     if ( a > b ) {
         return 1;
@@ -66,9 +61,8 @@ static gint key_compare( gconstpointer k1, gconstpointer k2, gpointer unused )
         return 0;
     }
 
-    return -1;  /* if a < b */
+    return -1; /* if a < b */
 }
-
 
 static gboolean value_search( gpointer k, gpointer v, gpointer data )
 {
@@ -76,9 +70,9 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data )
     gchar *value;
     struct value_search_data *vs;
 
-    key = ( guintptr ) k;
-    value = ( gchar * ) v;
-    vs = ( struct value_search_data * ) data;
+    key = (guintptr)k;
+    value = (gchar *)v;
+    vs = (struct value_search_data *)data;
 
     vs->idx = G3KB_SWITCH_MAX_LAYOUTS;
 
@@ -90,14 +84,13 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data )
     return FALSE;
 }
 
-
 static gboolean next_key_search( gpointer k, gpointer unused, gpointer data )
 {
     guintptr key;
     struct next_key_search_data *nks;
 
-    key = ( guintptr ) k;
-    nks = ( struct next_key_search_data * ) data;
+    key = (guintptr)k;
+    nks = (struct next_key_search_data *)data;
 
     if ( nks->next == G3KB_SWITCH_MAX_LAYOUTS ) {
         nks->next = key;
@@ -113,14 +106,12 @@ static gboolean next_key_search( gpointer k, gpointer unused, gpointer data )
     return FALSE;
 }
 
-
 gboolean g3kb_print_layouts( gpointer k, gpointer v, gpointer unused )
 {
-    g_print( "%s\n", ( const char * ) v );
+    g_print( "%s\n", (const char *)v );
 
     return FALSE;
 }
-
 
 static gboolean run_method( const gchar *name, const gchar *method,
                             const GVariantType *vtype, gchar **value,
@@ -160,23 +151,15 @@ static gboolean run_method( const gchar *name, const gchar *method,
         }
     }
 
-    result = g_dbus_connection_call_sync( c,
-                                          "org.gnome.Shell",
+    result = g_dbus_connection_call_sync(
+        c, "org.gnome.Shell",
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
-                                          "/org/g3kbswitch/G3kbSwitch",
-                                          "org.g3kbswitch.G3kbSwitch",
+        "/org/g3kbswitch/G3kbSwitch", "org.g3kbswitch.G3kbSwitch",
 #else
-                                          "/org/gnome/Shell",
-                                          "org.gnome.Shell",
+        "/org/gnome/Shell", "org.gnome.Shell",
 #endif
-                                          name,
-                                          param,
-                                          NULL,
-                                          G_DBUS_CALL_FLAGS_NONE,
-                                          G3KB_SWITCH_DBUS_CALL_TIMEOUT,
-                                          NULL,
-                                          err
-                                        );
+        name, param, NULL, G_DBUS_CALL_FLAGS_NONE,
+        G3KB_SWITCH_DBUS_CALL_TIMEOUT, NULL, err );
 
     if ( method != NULL ) {
         g_variant_unref( vmethod );
@@ -187,7 +170,7 @@ static gboolean run_method( const gchar *name, const gchar *method,
         return FALSE;
     }
 
-    if ( ! g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
+    if ( !g_variant_is_of_type( result, G_VARIANT_TYPE( "(bs)" ) ) ) {
         g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
                      "Unexpected response type" );
         g_variant_unref( result );
@@ -195,7 +178,7 @@ static gboolean run_method( const gchar *name, const gchar *method,
     }
 
     g_variant_get( result, "(bs)", &success, value );
-    if ( ! success ) {
+    if ( !success ) {
         g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_RUN_METHOD,
                      "Bad response: %s",
                      value == NULL || *value == NULL ? "<empty>" : *value );
@@ -210,7 +193,6 @@ static gboolean run_method( const gchar *name, const gchar *method,
 
     return TRUE;
 }
-
 
 GTree *g3kb_build_layouts_map( GError **err )
 {
@@ -234,14 +216,14 @@ GTree *g3kb_build_layouts_map( GError **err )
      * instead of i */
     method = "\"var ids=[];"
              "for(var i in imports.ui.status.keyboard.getInputSourceManager()"
-                 ".inputSources){"
-                 "ids.push({key:i,value:"
-                     "imports.ui.status.keyboard.getInputSourceManager()"
-                         ".inputSources[i].id})};"
+             ".inputSources){"
+             "ids.push({key:i,value:"
+             "imports.ui.status.keyboard.getInputSourceManager()"
+             ".inputSources[i].id})};"
              "ids\"";
 #endif
 
-    if ( ! run_method( name, method, NULL, &dict, err ) ) {
+    if ( !run_method( name, method, NULL, &dict, err ) ) {
         return NULL;
     }
 
@@ -256,7 +238,7 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     g_free( dict );
 
-    if ( ! g_variant_is_of_type( vdict, G_VARIANT_TYPE( "aa{ss}" ) ) ) {
+    if ( !g_variant_is_of_type( vdict, G_VARIANT_TYPE( "aa{ss}" ) ) ) {
         g_set_error( err, G3KB_SWITCH_ERROR,
                      G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
                      "Unexpected type of response value" );
@@ -268,7 +250,7 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     g_variant_iter_init( &iter1, vdict );
     while ( g_variant_iter_loop( &iter1, "a{ss}", &iter2 ) ) {
-        k = ( gpointer ) G3KB_SWITCH_MAX_LAYOUTS;
+        k = (gpointer)G3KB_SWITCH_MAX_LAYOUTS;
         v = NULL;
         while ( g_variant_iter_loop( iter2, "{ss}", &key, &value ) ) {
             if ( g_strcmp0( key, "key" ) == 0 ) {
@@ -276,9 +258,9 @@ GTree *g3kb_build_layouts_map( GError **err )
                 errno = 0;
                 /* weirdly, g_ascii_strtoull() and g_ascii_string_to_unsigned()
                  * sometimes fail here with errno set to EAGAIN! */
-                idx = ( guintptr ) strtoull( value, NULL, 10 );
+                idx = (guintptr)strtoull( value, NULL, 10 );
                 if ( errno == 0 && idx < G3KB_SWITCH_MAX_LAYOUTS ) {
-                    k = ( gpointer ) idx;
+                    k = (gpointer)idx;
                 } else {
                     g_set_error( err, G3KB_SWITCH_ERROR,
                                  G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
@@ -295,7 +277,7 @@ GTree *g3kb_build_layouts_map( GError **err )
                     v = g_strdup( value );
                 }
             }
-            if ( ( guintptr ) k < G3KB_SWITCH_MAX_LAYOUTS && v != NULL ) {
+            if ( (guintptr)k < G3KB_SWITCH_MAX_LAYOUTS && v != NULL ) {
                 g_tree_insert( layouts, k, v );
                 continue;
             }
@@ -306,7 +288,6 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     return layouts;
 }
-
 
 guint g3kb_get_layout( GError **err )
 {
@@ -323,14 +304,14 @@ guint g3kb_get_layout( GError **err )
              ".currentSource.index\"";
 #endif
 
-    if ( ! run_method( name, method, NULL, &value, err ) ) {
+    if ( !run_method( name, method, NULL, &value, err ) ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
     errno = 0;
     /* see why we do not use g_ascii_strtoull() or g_ascii_string_to_unsigned()
      * in a comment inside g3kb_build_layouts_map() */
-    idx = ( guintptr ) strtoull( value, NULL, 10 );
+    idx = (guintptr)strtoull( value, NULL, 10 );
     if ( errno != 0 || idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         g_set_error( err, G3KB_SWITCH_ERROR, G3KB_SWITCH_ERROR_GET_LAYOUT,
                      "Key %s is not a valid index",
@@ -344,24 +325,22 @@ guint g3kb_get_layout( GError **err )
 
     g_free( value );
 
-    return ( guint ) idx;
+    return (guint)idx;
 }
-
 
 gboolean g3kb_set_layout( guint idx, GError **err )
 {
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
     static const gsize method_activate_len =
         /* zero terminator */ /* max 3 digits for index */
-           1 +                   3;
+        1 + 3;
 #else
     static const gchar *method_activate_head =
         "\"imports.ui.status.keyboard.getInputSourceManager().inputSources[";
-    static const gchar *method_activate_tail =
-        "].activate()\"";
+    static const gchar *method_activate_tail = "].activate()\"";
     static const gsize method_activate_len =
         /* head */ /* tail */ /* zero terminator */ /* max 3 digits for index */
-           65 +       13 +       1 +                   3;
+        65 + 13 + 1 + 3;
 #endif
 
     const gchar *name = NULL;
@@ -380,21 +359,19 @@ gboolean g3kb_set_layout( guint idx, GError **err )
     g_snprintf( method, method_activate_len, "%u", idx );
 #else
     name = "Eval";
-    g_snprintf( method, method_activate_len, "%s%u%s",
-                method_activate_head, idx, method_activate_tail );
+    g_snprintf( method, method_activate_len, "%s%u%s", method_activate_head,
+                idx, method_activate_tail );
 #endif
 
     return run_method( name, method, vtype, NULL, err );
 }
 
-
 gconstpointer g3kb_search_layout( GTree *layouts, guint idx )
 {
-    guintptr layout_idx = ( guintptr ) idx;
+    guintptr layout_idx = (guintptr)idx;
 
-    return g_tree_lookup( layouts, ( gconstpointer ) layout_idx );
+    return g_tree_lookup( layouts, (gconstpointer)layout_idx );
 }
-
 
 guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
 {
@@ -409,7 +386,6 @@ guintptr g3kb_reverse_search_layout( GTree *layouts, const gchar *layout )
     return vs.idx;
 }
 
-
 gconstpointer g3kb_safe_get_layout( GTree *layouts, GError **err )
 {
     guint idx;
@@ -422,20 +398,18 @@ gconstpointer g3kb_safe_get_layout( GTree *layouts, GError **err )
     return g3kb_search_layout( layouts, idx );
 }
 
-
 gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
                                GError **err )
 {
     guint idx;
 
-    idx = ( guint ) g3kb_reverse_search_layout( layouts, layout );
+    idx = (guint)g3kb_reverse_search_layout( layouts, layout );
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return FALSE;
     }
 
     return g3kb_set_layout( idx, err );
 }
-
 
 guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
 {
@@ -445,7 +419,7 @@ guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
      * the returned value is supposed to be later passed to
      * g3kb_set_next_layout(), this should not be a problem */
 
-    nks.key = ( guintptr ) g3kb_get_layout( err );
+    nks.key = (guintptr)g3kb_get_layout( err );
     if ( nks.key >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
@@ -457,16 +431,14 @@ guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
     return nks.next;
 }
 
-
 gboolean g3kb_set_next_layout( GTree *layouts, GError **err )
 {
     guint idx;
 
-    idx = ( guint ) g3kb_get_next_layout( layouts, err );
+    idx = (guint)g3kb_get_next_layout( layouts, err );
     if ( idx >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return FALSE;
     }
 
     return g3kb_set_layout( idx, err );
 }
-

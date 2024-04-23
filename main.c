@@ -10,34 +10,31 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Alexey Radkov (), 
- *        Company:  
+ *         Author:  Alexey Radkov (),
+ *        Company:
  *
  * =============================================================================
  */
 
-#include "switch.h"
 #include "config.h"
-
+#include "switch.h"
 
 static void version( void )
 {
     g_print( "g3kb-switch version %s\n", PROJECT_VERSION );
 }
 
-
 static void usage( void )
 {
     version();
-    g_print( "Usage: g3kb-switch [-p]      Show the current layout group\n"
-             "       g3kb-switch -l        Show available layout groups\n"
-             "       g3kb-switch -n        Switch to the next layout group\n"
-             "       g3kb-switch -s ARG    Switch to layout group ARG\n"
-             "       g3kb-switch -h        Show this message and exit\n"
-             "       g3kb-switch -v        Show the program version and exit\n"
-           );
+    g_print(
+        "Usage: g3kb-switch [-p]      Show the current layout group\n"
+        "       g3kb-switch -l        Show available layout groups\n"
+        "       g3kb-switch -n        Switch to the next layout group\n"
+        "       g3kb-switch -s ARG    Switch to layout group ARG\n"
+        "       g3kb-switch -h        Show this message and exit\n"
+        "       g3kb-switch -v        Show the program version and exit\n" );
 }
-
 
 int main( int argc, char **argv )
 {
@@ -52,13 +49,11 @@ int main( int argc, char **argv )
 
     if ( argc > 1 ) {
         if ( g_strcmp0( argv[ 1 ], "-h" ) == 0 ||
-             g_strcmp0( argv[ 1 ], "--help" ) == 0 )
-        {
-            usage ();
+             g_strcmp0( argv[ 1 ], "--help" ) == 0 ) {
+            usage();
             return 0;
         } else if ( g_strcmp0( argv[ 1 ], "-v" ) == 0 ||
-                    g_strcmp0( argv[ 1 ], "--version" ) == 0 )
-        {
+                    g_strcmp0( argv[ 1 ], "--version" ) == 0 ) {
             version();
             return 0;
         } else if ( g_strcmp0( argv[ 1 ], "-l" ) == 0 ) {
@@ -67,7 +62,7 @@ int main( int argc, char **argv )
             display_current_layout = TRUE;
         } else if ( g_strcmp0( argv[ 1 ], "-s" ) == 0 ) {
             if ( argc < 3 ) {
-                usage ();
+                usage();
                 return 1;
             }
             activate_new_layout = TRUE;
@@ -75,7 +70,7 @@ int main( int argc, char **argv )
         } else if ( g_strcmp0( argv[ 1 ], "-n" ) == 0 ) {
             activate_next_layout = TRUE;
         } else {
-            usage ();
+            usage();
             return 1;
         }
     } else {
@@ -101,9 +96,9 @@ int main( int argc, char **argv )
             g_tree_unref( layouts );
             return 1;
         }
-        g_print( "%s\n", ( char * ) layout );
+        g_print( "%s\n", (char *)layout );
     } else if ( activate_new_layout ) {
-        if ( ! g3kb_safe_set_layout( layouts, new_layout, &err ) ) {
+        if ( !g3kb_safe_set_layout( layouts, new_layout, &err ) ) {
             g_printerr( "Failed to activate layout %s: %s\n", new_layout,
                         err == NULL ? "<no details>" : err->message );
             g_clear_error( &err );
@@ -111,7 +106,7 @@ int main( int argc, char **argv )
             return 1;
         }
     } else if ( activate_next_layout ) {
-        if ( ! g3kb_set_next_layout( layouts, &err ) ) {
+        if ( !g3kb_set_next_layout( layouts, &err ) ) {
             g_printerr( "Failed to activate next layout: %s\n",
                         err == NULL ? "<no details>" : err->message );
             g_clear_error( &err );
@@ -124,4 +119,3 @@ int main( int argc, char **argv )
 
     return 0;
 }
-
