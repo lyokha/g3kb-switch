@@ -43,7 +43,6 @@ struct value_search_data {
 struct next_key_search_data {
     guintptr key;
     guintptr next;
-    gboolean found;
 };
 
 /* compare two guintptr values */
@@ -88,19 +87,17 @@ static gboolean next_key_search( gpointer k, gpointer unused, gpointer data )
 {
     guintptr key;
     struct next_key_search_data *nks;
+    static gboolean found;
 
     key = (guintptr)k;
     nks = (struct next_key_search_data *)data;
 
-    if ( nks->next == G3KB_SWITCH_MAX_LAYOUTS ) {
-        nks->next = key;
-    }
-    if ( nks->found ) {
+    if ( found ) {
         nks->next = key;
         return TRUE;
     }
     if ( key == nks->key ) {
-        nks->found = TRUE;
+        found = TRUE;
     }
 
     return FALSE;
@@ -424,8 +421,10 @@ guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
-    nks.next = G3KB_SWITCH_MAX_LAYOUTS;
-    nks.found = FALSE;
+    /* if current layout is last layout, next layout will be not found
+     * just return 0 to use the first layout
+     */
+    nks.next = 0;
     g_tree_foreach( layouts, next_key_search, &nks );
 
     return nks.next;
