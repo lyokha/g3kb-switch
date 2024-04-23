@@ -175,7 +175,6 @@ GTree *g3kb_build_layouts_map( GError **err )
     const gchar *method;
     const GVariantType *vtype;
     gchar *key, *value;
-    gpointer k, v;
     gchar *dict = NULL;
 
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
@@ -224,38 +223,14 @@ GTree *g3kb_build_layouts_map( GError **err )
 
     layouts = g_tree_new_full( key_compare, NULL, NULL, g_free );
 
-    g_variant_iter_init( &iter1, vdict );
-    while ( g_variant_iter_loop( &iter1, "a{ss}", &iter2 ) ) {
-        k = (gpointer)G3KB_SWITCH_MAX_LAYOUTS;
-        v = NULL;
+    gsize size = g_variant_iter_init( &iter1, vdict );
+    for ( gsize i = 0; i < size; i++ ) {
+        g_variant_iter_loop( &iter1, "a{ss}", &iter2 );
         while ( g_variant_iter_loop( iter2, "{ss}", &key, &value ) ) {
-            if ( g_strcmp0( key, "key" ) == 0 ) {
-                guintptr idx = G3KB_SWITCH_MAX_LAYOUTS;
-                errno = 0;
-                /* weirdly, g_ascii_strtoull() and g_ascii_string_to_unsigned()
-                 * sometimes fail here with errno set to EAGAIN! */
-                idx = (guintptr)strtoull( value, NULL, 10 );
-                if ( errno == 0 && idx < G3KB_SWITCH_MAX_LAYOUTS ) {
-                    k = (gpointer)idx;
-                } else {
-                    g_set_error( err, G3KB_SWITCH_ERROR,
-                                 G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
-                                 "Key %s is not a valid index",
-                                 value == NULL ? "<empty>" : value );
-                    g_variant_unref( vdict );
-                    g_tree_unref( layouts );
-                    return NULL;
-                }
-            } else if ( g_strcmp0( key, "value" ) == 0 ) {
-                if ( g_strcmp0( value, "" ) == 0 ) {
-                    v = g_strdup( "(nil)" );
-                } else {
-                    v = g_strdup( value );
-                }
-            }
-            if ( (guintptr)k < G3KB_SWITCH_MAX_LAYOUTS && v != NULL ) {
-                g_tree_insert( layouts, k, v );
-                continue;
+            if ( g_strcmp0( key, "value" ) == 0 ) {
+                g_tree_insert(
+                    layouts, (gpointer)i,
+                    g_strdup( g_strcmp0( value, "" ) ? value : "(nil)" ) );
             }
         }
     }
