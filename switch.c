@@ -25,15 +25,15 @@
 #define G3KB_SWITCH_MAX_LAYOUTS 256
 #define G3KB_SWITCH_DBUS_CALL_TIMEOUT 2000
 
-static G_DEFINE_QUARK( g3kb_switch_error_quark, g3kb_switch_error )
+G_DEFINE_QUARK( g3kb_switch_error_quark, g3kb_switch_error )
 #define G3KB_SWITCH_ERROR g3kb_switch_error_quark()
 
-    enum g3kb_switch_error_type {
-        G3KB_SWITCH_ERROR_RUN_METHOD,
-        G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
-        G3KB_SWITCH_ERROR_GET_LAYOUT,
-        G3KB_SWITCH_ERROR_SET_LAYOUT,
-    };
+enum g3kb_switch_error_type {
+    G3KB_SWITCH_ERROR_RUN_METHOD,
+    G3KB_SWITCH_ERROR_BUILD_LAYOUTS_MAP,
+    G3KB_SWITCH_ERROR_GET_LAYOUT,
+    G3KB_SWITCH_ERROR_SET_LAYOUT,
+};
 
 struct value_search_data {
     const gchar *value;
