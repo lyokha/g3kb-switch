@@ -40,11 +40,6 @@ struct value_search_data {
     guintptr idx;
 };
 
-struct next_key_search_data {
-    guintptr key;
-    guintptr next;
-};
-
 /* compare two guintptr values */
 static gint key_compare( gconstpointer k1, gconstpointer k2, gpointer unused )
 {
@@ -78,26 +73,6 @@ static gboolean value_search( gpointer k, gpointer v, gpointer data )
     if ( g_strcmp0( vs->value, value ) == 0 ) {
         vs->idx = key;
         return TRUE;
-    }
-
-    return FALSE;
-}
-
-static gboolean next_key_search( gpointer k, gpointer unused, gpointer data )
-{
-    guintptr key;
-    struct next_key_search_data *nks;
-    static gboolean found;
-
-    key = (guintptr)k;
-    nks = (struct next_key_search_data *)data;
-
-    if ( found ) {
-        nks->next = key;
-        return TRUE;
-    }
-    if ( key == nks->key ) {
-        found = TRUE;
     }
 
     return FALSE;
@@ -410,24 +385,24 @@ gboolean g3kb_safe_set_layout( GTree *layouts, const gchar *layout,
 
 guintptr g3kb_get_next_layout( GTree *layouts, GError **err )
 {
-    struct next_key_search_data nks;
-
     /* BEWARE: may return invalid value G3KB_SWIkCH_MAX_LAYOUTS, but as far as
      * the returned value is supposed to be later passed to
      * g3kb_set_next_layout(), this should not be a problem */
 
-    nks.key = (guintptr)g3kb_get_layout( err );
-    if ( nks.key >= G3KB_SWITCH_MAX_LAYOUTS ) {
+    guintptr key = (guintptr)g3kb_get_layout( err );
+    if ( key >= G3KB_SWITCH_MAX_LAYOUTS ) {
         return G3KB_SWITCH_MAX_LAYOUTS;
     }
 
+    GTreeNode *node = g_tree_lookup_node( layouts, (gconstpointer)key );
     /* if current layout is last layout, next layout will be not found
      * just return 0 to use the first layout
      */
-    nks.next = 0;
-    g_tree_foreach( layouts, next_key_search, &nks );
+    if ( node == NULL || ( node = g_tree_node_next( node ) ) == NULL ) {
+        return 0;
+    }
 
-    return nks.next;
+    return (guintptr)g_tree_node_key( node );
 }
 
 gboolean g3kb_set_next_layout( GTree *layouts, GError **err )
