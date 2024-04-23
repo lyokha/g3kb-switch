@@ -195,7 +195,7 @@ GTree *g3kb_build_layouts_map( GError **err )
              "imports.ui.status.keyboard.getInputSourceManager()"
              ".inputSources[i].id})};"
              "ids\"";
-    vtype = G_VARIANT_TYPE( "s" );
+    vtype = G_VARIANT_TYPE_STRING;
 #endif
 
     if ( !run_method( name, method, vtype, &dict, err ) ) {
@@ -254,7 +254,7 @@ guint g3kb_get_layout( GError **err )
     method = NULL;
 #else
     name = "Eval";
-    vtype = G_VARIANT_TYPE( "s" );
+    vtype = G_VARIANT_TYPE_STRING;
     method = "\"imports.ui.status.keyboard.getInputSourceManager()"
              ".currentSource.index\"";
 #endif
@@ -310,11 +310,11 @@ gboolean g3kb_set_layout( guint idx, GError **err )
 
 #ifdef G3KBSWITCH_WITH_GNOME_SHELL_EXTENSION
     name = "Set";
-    vtype = G_VARIANT_TYPE( "u" );
+    vtype = G_VARIANT_TYPE_UINT32;
     g_snprintf( method, method_activate_len, "%u", idx );
 #else
     name = "Eval";
-    vtype = G_VARIANT_TYPE( "s" );
+    vtype = G_VARIANT_TYPE_STRING;
     g_snprintf( method, method_activate_len,
                 METHOD_ACTIVATE_HEAD "%u" METHOD_ACTIVATE_TAIL, idx );
 #endif
