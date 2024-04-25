@@ -95,6 +95,10 @@ repos:
           - markdown
           - yaml
           - json
+  - repo: https://github.com/Decodetalkers/neocmakelsp
+    rev: v0.6.23
+    hooks:
+      - id: neocmakelsp-format
   - repo: https://github.com/nix-community/nixpkgs-fmt
     rev: v1.3.0
     hooks:
