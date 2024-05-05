@@ -2,9 +2,11 @@ on:
   push:
     paths:
       - README.md.in
+      - .github/workflows/readme.yml
   pull_request:
     paths:
       - README.md.in
+      - .github/workflows/readme.yml
   workflow_dispatch:
 jobs:
   build:
