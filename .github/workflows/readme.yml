@@ -22,6 +22,8 @@ jobs:
           neovim: true
         id: neovim
       - name: Render README.md
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
         run: |
           wget https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-1-amd64.deb
           sudo apt install -y ./pandoc-3.1.13-1-amd64.deb
@@ -44,5 +46,5 @@ jobs:
           git remote set-url origin \
               "https://lyokha:${{ secrets.GITHUB_COMMIT_README }}@github.com"`
              `"/${{ github.repository }}"
-          git push origin master
+          git push origin $BRANCH_NAME
 
