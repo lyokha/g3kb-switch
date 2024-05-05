@@ -32,10 +32,13 @@ jobs:
           wget https://github.com/lyokha/vim-publish-helper/releases/download/0.15/vimhl-0.15-ghc-9.8 \
               -Ovimhl
           chmod a+x vimhl
-          sed "1s'.*'&\nset runtimepath^=$(pwd)/vim-lucius,$(pwd)/vim-publish-helper-0.15'" \
+          sed "1s'.*'&\nset runtimepath+=$(pwd)/vim-lucius\nset runtimepath+=$(pwd)/vim-publish-helper-0.15'" \
                .vimrc.pandoc
+          ls $(pwd)/vim-lucius
+          ls $(pwd)/vim-publish-helper-0.15
           export VIMHL_BACKEND=${{ steps.neovim.outputs.executable }}
-          export VIMRC_PANDOC="$(pwd)/.vimrc.pandoc"
+          # export VIMRC_PANDOC="$(pwd)/.vimrc.pandoc"
+          cp -u .vimrc.pandoc $HOME
           pandoc -fmarkdown -tgfm -Fvimhl README.md.in > README.md
           git config --local user.name "github-actions[bot]"
           git config --local user.email \
