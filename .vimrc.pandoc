@@ -1,0 +1,25 @@
+set nocompatible
+
+filetype off    " filetype is set by vimhl
+
+let g:lucius_style = 'light'
+let g:lucius_contrast = 'high'
+let g:lucius_contrast_bg = 'high'
+let g:lucius_no_term_bg = 1
+colorscheme lucius
+
+syntax on
+
+if !exists('g:PhHtmlPreAttrs')
+    let g:PhHtmlPreAttrs = 'style="overflow-x: auto; background: #FFE"'
+endif
+
+if exists('g:PhBlockRole') && g:PhBlockRole == 'gfm-output'
+    let g:PhHtmlPreAttrs = 'style="overflow-x: auto; '.
+            \ 'border-style: none none none solid; border-color: #6DF; '.
+            \ 'border-width: 3px; padding: 5px 10px"'
+endif
+
+runtime plugin/publish_helper.vim
+
+" vim: ft=vim

@@ -1,0 +1,42 @@
+on:
+  push:
+    paths:
+      - README.md.in
+  pull_request:
+    paths:
+      - README.md.in
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install vim
+        uses: rhysd/action-setup-vim@v1.3.2
+        id: vim
+      - name: Render README.md
+        run: |
+          sudo apt-get install -y pandoc
+          mkdir .vim
+          git clone https://github.com/jonathanfilip/vim-lucius vim-lucius
+          wget https://github.com/lyokha/vim-publish-helper/archive/refs/tags/0.15.tar.gz \
+              -Ovim-publish-helper.tar.gz
+          tar xvf vim-publish-helper.tar.gz
+          wget https://github.com/lyokha/vim-publish-helper/releases/download/0.15/vimhl-0.15-ghc-9.8 \
+              -Ovimhl
+          chmod a+x vimhl
+          sed '1s/.*/&\nset runtimepath^=vim-lucius,vim-publish-helper-0.15/' \
+               .vimrc.pandoc
+          pandoc -fmarkdown -tgfm -Fvimhl README.md.in > README.md
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email \
+              "github-actions[bot]@users.noreply.github.com"
+          git commit README.md -m "Render README.md"
+          git remote set-url origin \
+              "https://lyokha:${{ secrets.GITHUB_COMMIT_README }}@github.com"`
+             `"/${{ github.repository }}"
+          git push origin master
+
