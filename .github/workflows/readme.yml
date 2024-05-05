@@ -16,14 +16,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install vim
+      - name: Install Neovim
         uses: rhysd/action-setup-vim@v1.3.2
-        id: vim
+        with:
+          neovim: true
+        id: neovim
       - name: Render README.md
         run: |
           wget https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-1-amd64.deb
           sudo apt install -y ./pandoc-3.1.13-1-amd64.deb
-          mkdir .vim
           git clone https://github.com/jonathanfilip/vim-lucius vim-lucius
           wget https://github.com/lyokha/vim-publish-helper/archive/refs/tags/0.15.tar.gz \
               -Ovim-publish-helper.tar.gz
@@ -33,6 +34,8 @@ jobs:
           chmod a+x vimhl
           sed '1s/.*/&\nset runtimepath^=vim-lucius,vim-publish-helper-0.15/' \
                .vimrc.pandoc
+          export VIMHL_BACKEND=${{ steps.neovim.outputs.executable }}
+          export VIMRC_PANDOC=.vimrc.pandoc
           pandoc -fmarkdown -tgfm -Fvimhl README.md.in > README.md
           git config --local user.name "github-actions[bot]"
           git config --local user.email \
