@@ -32,7 +32,7 @@ jobs:
           wget https://github.com/lyokha/vim-publish-helper/releases/download/0.15/vimhl-0.15-ghc-9.8 \
               -Ovimhl
           chmod a+x vimhl
-          sed "1s/.*/&\nset runtimepath^=${pwd}/vim-lucius,${pwd}/vim-publish-helper-0.15/" \
+          sed "1s'.*'&\nset runtimepath^=${pwd}/vim-lucius,${pwd}/vim-publish-helper-0.15'" \
                .vimrc.pandoc
           export VIMHL_BACKEND=${{ steps.neovim.outputs.executable }}
           export VIMRC_PANDOC="$pwd/.vimrc.pandoc"
