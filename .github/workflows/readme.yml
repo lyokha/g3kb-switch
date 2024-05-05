@@ -19,7 +19,8 @@ jobs:
         id: vim
       - name: Render README.md
         run: |
-          sudo apt-get install -y pandoc
+          wget https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-1-amd64.deb
+          sudo apt install pandoc-3.1.13-1-amd64.deb
           mkdir .vim
           git clone https://github.com/jonathanfilip/vim-lucius vim-lucius
           wget https://github.com/lyokha/vim-publish-helper/archive/refs/tags/0.15.tar.gz \
