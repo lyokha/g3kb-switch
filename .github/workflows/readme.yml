@@ -39,12 +39,14 @@ jobs:
           export VIMHL_BACKEND=${{ steps.neovim.outputs.executable }}
           export VIMRC_PANDOC="$(pwd)/.vimrc.pandoc"
           pandoc -fmarkdown -tgfm -Fvimhl README.md.in > README.md
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email \
-              "github-actions[bot]@users.noreply.github.com"
-          git commit README.md -m "Render README.md"
-          git remote set-url origin \
-              "https://lyokha:${{ secrets.GITHUB_COMMIT_README }}@github.com"`
-             `"/${{ github.repository }}"
-          git push origin $BRANCH_NAME
+          if ! git diff --quiet README.md
+          then
+              git config --local user.name "github-actions[bot]"
+              git config --local user.email \
+                  "github-actions[bot]@users.noreply.github.com"
+              git commit README.md -m "Render README.md"
+              git remote set-url origin \
+                  "https://lyokha:${{ secrets.GITHUB_COMMIT_README }}@github.com/${{ github.repository }}"
+              git push origin $BRANCH_NAME
+          fi
 
