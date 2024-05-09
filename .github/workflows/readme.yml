@@ -28,13 +28,13 @@ jobs:
           wget https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-1-amd64.deb
           sudo apt install -y ./pandoc-3.1.13-1-amd64.deb
           git clone https://github.com/jonathanfilip/vim-lucius vim-lucius
-          wget https://github.com/lyokha/vim-publish-helper/archive/refs/tags/0.15.tar.gz \
+          wget https://github.com/lyokha/vim-publish-helper/archive/refs/tags/0.15.1.tar.gz \
               -Ovim-publish-helper.tar.gz
           tar xvf vim-publish-helper.tar.gz
-          wget https://github.com/lyokha/vim-publish-helper/releases/download/0.15/vimhl-0.15-${{ runner.os }}-ghc-9.8 \
+          wget https://github.com/lyokha/vim-publish-helper/releases/download/0.15.1/vimhl-0.15.1-${{ runner.os }}-ghc-9.8 \
               -Ovimhl
           chmod a+x vimhl
-          sed -i "1s'.*'&\nset runtimepath+=$(pwd)/vim-lucius\nset runtimepath+=$(pwd)/vim-publish-helper-0.15'" \
+          sed -i "1s'.*'&\nset runtimepath+=$(pwd)/vim-lucius\nset runtimepath+=$(pwd)/vim-publish-helper-0.15.1'" \
               .vimrc.pandoc
           export VIMHL_BACKEND=${{ steps.neovim.outputs.executable }}
           export VIMRC_PANDOC="$(pwd)/.vimrc.pandoc"
