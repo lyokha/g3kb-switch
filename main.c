@@ -5,7 +5,6 @@
  *
  *    Description:  g3kb-switch program
  *
- *        Version:  1.4
  *        Created:  10.12.2019 14:59:38
  *       Revision:  none
  *       Compiler:  gcc
