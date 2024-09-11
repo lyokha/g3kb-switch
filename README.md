@@ -9,6 +9,8 @@ Shell.
 
 ## Installation
 
+<a href="https://repology.org/project/g3kb-switch/versions"><img align="right" src="https://repology.org/badge/vertical-allrepos/g3kb-switch.svg" alt="Packaging status"></a>
+
 ### Install
 
 You can directly install this program by:
