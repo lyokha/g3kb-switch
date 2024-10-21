@@ -3,7 +3,7 @@ exclude: ^flake\.lock$
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: fix-byte-order-marker
@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: remove-crlf
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         additional_dependencies:
@@ -39,7 +39,7 @@ repos:
         args:
           - --msg-filename
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 2.7.3
+    rev: 3.0.3
     hooks:
       - id: editorconfig-checker
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -51,7 +51,7 @@ repos:
         exclude_types:
           - zsh
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.6.27
+    rev: v1.7.3
     hooks:
       - id: actionlint
   - repo: https://github.com/adrienverge/yamllint
@@ -59,7 +59,7 @@ repos:
     hooks:
       - id: yamllint
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.18
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -74,14 +74,14 @@ repos:
           - mdformat-web
         exclude: \.1\.md$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.13.0
+    rev: v0.14.0
     hooks:
       - id: markdownlint-cli2
         exclude: \.1\.md$
         additional_dependencies:
           - markdown-it-texmath
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.4
+    rev: v19.1.2
     hooks:
       - id: clang-format
         exclude_types:
@@ -96,7 +96,7 @@ repos:
           - yaml
           - json
   - repo: https://github.com/Decodetalkers/neocmakelsp
-    rev: v0.6.23
+    rev: v0.8.12
     hooks:
       - id: neocmakelsp-format
   - repo: https://github.com/nix-community/nixpkgs-fmt
