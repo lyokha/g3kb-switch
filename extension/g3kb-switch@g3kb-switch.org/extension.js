@@ -1,6 +1,6 @@
 /// <reference types="@girs/gio-2.0/gio-2.0" />
-/// <reference types="@girs/gnome-shell/dist/extensions" />
-/// <reference types="@girs/gnome-shell/dist/ui/status/keyboard-ambient" />
+/// <reference types="@girs/gnome-shell/extensions/extension/ambient" />
+/// <reference types="@girs/gnome-shell/ui/status/keyboard/ambient" />
 
 'use strict';
 
