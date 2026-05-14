@@ -9,7 +9,13 @@ Shell.
 
 ## Installation
 
+<!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD033 -->
+
 <a href="https://repology.org/project/g3kb-switch/versions"><img align="right" src="https://repology.org/badge/vertical-allrepos/g3kb-switch.svg" alt="Packaging status"></a>
+
+<!-- markdownlint-enable MD033 -->
+<!-- markdownlint-enable MD013 -->
 
 ### Install
 
