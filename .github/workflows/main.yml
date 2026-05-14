@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           sudo apt-get -y update
@@ -36,13 +36,13 @@ jobs:
       # - uses: codecov/codecov-action@v3
       #   with:
       #     gcov: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: "! startsWith(github.ref, 'refs/tags/')"
         with:
           path: |
             build/*.deb
             build/*.rpm
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
