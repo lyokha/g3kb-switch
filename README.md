@@ -197,5 +197,6 @@ $ pkg-config g3kb-switch --variable libpath
 Notice that setting this variable is optional because vim-xkbswitch tries its
 best to autodetect the path.
 
-See details about configuration rules for vim-xkbswitch
-[here](https://github.com/lyokha/vim-xkbswitch#basic-configuration).
+See [Basic
+configuration](https://github.com/lyokha/vim-xkbswitch#basic-configuration)
+for details about configuration rules in vim-xkbswitch.
