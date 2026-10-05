@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: remove-crlf
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
         additional_dependencies:
@@ -39,7 +39,7 @@ repos:
         args:
           - --msg-filename
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 3.6.1
+    rev: 3.11.1
     hooks:
       - id: editorconfig-checker
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -74,14 +74,14 @@ repos:
           - mdformat-web
         exclude: \.1\.md$
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.1
+    rev: v0.23.3
     hooks:
       - id: markdownlint-cli2
         exclude: \.1\.md$
         additional_dependencies:
           - markdown-it-texmath
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.5
+    rev: v23.1.2
     hooks:
       - id: clang-format
         exclude_types:
@@ -96,7 +96,7 @@ repos:
           - yaml
           - json
   - repo: https://github.com/Decodetalkers/neocmakelsp
-    rev: v0.10.2
+    rev: v0.11.2
     hooks:
       - id: neocmakelsp-format
   - repo: https://github.com/nix-community/nixpkgs-fmt
